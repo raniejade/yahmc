@@ -1,0 +1,8 @@
+[package]
+name = "engine"
+version = "0.1.0"
+authors = ["Ranie Jade Ramiso <raniejaderamiso@gmail.com>"]
+
+[dependencies]
+rlua = "0.13.0"
+log = "0.4.0"
