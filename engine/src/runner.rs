@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 use convention::Convention;
 
+use rlua::{Lua, Result};
+use api;
+
 pub struct RunnerSettings {
     root: PathBuf
 }
@@ -17,10 +20,22 @@ pub struct Runner {
     pub settings: RunnerSettings
 }
 
+
 impl Runner {
-    pub fn run(&self) {
-        let convention = Convention::create(&self.settings.root);
-        info!("Running engine ...");
+    pub fn run(self) -> Result<()> {
+        let convention = Convention::create(self.settings.root);
+        info!("Starting engine ...");
         info!("{:#?}", convention);
+        let lua = Lua::new();
+        api::install(&lua, &convention)?;
+        lua.eval::<()>(
+            r#"
+            local Vector = Yahmc:require("components/vector")
+            print(Vector)
+            "#,
+            None,
+        )?;
+
+        return Ok(())
     }
 }

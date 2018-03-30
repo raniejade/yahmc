@@ -1,4 +1,4 @@
-local Vector = Engine:require("components/vector")
+local Vector = Yahmc:require("components/vector")
 
 local Processor = { 
   components = [Vector]

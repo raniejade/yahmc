@@ -10,5 +10,9 @@ fn main() {
     let root = exe.parent().unwrap();
     let runner = engine::Builder::create(root.to_path_buf())
         .build();
-    runner.run();
+    let result = runner.run();
+    match result {
+        Err(e) => println!("{}", e),
+        _ => ()
+    }
 }

@@ -1,10 +1,13 @@
+#![feature(pattern_parentheses)] 
+
 #[macro_use]
 extern crate log;
+extern crate rlua;
 
 
 pub mod runner;
 mod convention;
-mod lua;
+mod api;
 
 use runner::{Runner, RunnerSettings};
 use std::path::PathBuf;
