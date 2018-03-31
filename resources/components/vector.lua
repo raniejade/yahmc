@@ -4,7 +4,7 @@ function Vector:new(object) {
   object = object or {}
   self.__index = self
   setmetatable(object, self)
-  return self
+  return object
 }
 
-return Vector
+return Engine:createComponent(Vector)
