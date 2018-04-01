@@ -1,15 +1,14 @@
 use rlua::{Lua, Result, Table};
-use super::internals;
 
-pub struct ClassRegistry<'lua> {
-    lua: &'lua Lua
-}
+static REGISTRY_NAME: &str = "__yamhc__registry";
+
+pub struct ClassRegistry<'lua>(&'lua Lua);
 
 impl<'lua> ClassRegistry<'lua> {
     pub fn create(lua: &'lua Lua) -> ClassRegistry<'lua> {
         let internal_registry = lua.create_table().unwrap();
-        lua.globals().set(internals::REGISTRY_NAME, internal_registry);
-        return ClassRegistry { lua };
+        lua.globals().set(REGISTRY_NAME, internal_registry);
+        return ClassRegistry(lua);
     }
 
     pub fn get(&self, name: &String) -> Option<Table> {
@@ -28,7 +27,7 @@ impl<'lua> ClassRegistry<'lua> {
     }
 
     fn get_internal_registry(&self) -> Table {
-        return self.lua.globals().get::<_, Table>(internals::REGISTRY_NAME).unwrap();
+        return self.0.globals().get::<_, Table>(REGISTRY_NAME).unwrap();
     }
 }
 
