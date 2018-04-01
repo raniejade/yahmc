@@ -1,1 +1,1 @@
-pub static INTERNAL_REGISTRY_NAME: &str = "__yamhc__registry";
+pub static REGISTRY_NAME: &str = "__yamhc__registry";

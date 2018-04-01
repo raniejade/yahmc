@@ -8,7 +8,7 @@ pub struct ClassRegistry<'lua> {
 impl<'lua> ClassRegistry<'lua> {
     pub fn create(lua: &'lua Lua) -> ClassRegistry<'lua> {
         let internal_registry = lua.create_table().unwrap();
-        lua.globals().set(internals::INTERNAL_REGISTRY_NAME, internal_registry);
+        lua.globals().set(internals::REGISTRY_NAME, internal_registry);
         return ClassRegistry { lua };
     }
 
@@ -28,7 +28,7 @@ impl<'lua> ClassRegistry<'lua> {
     }
 
     fn get_internal_registry(&self) -> Table {
-        return self.lua.globals().get::<_, Table>(internals::INTERNAL_REGISTRY_NAME).unwrap();
+        return self.lua.globals().get::<_, Table>(internals::REGISTRY_NAME).unwrap();
     }
 }
 
