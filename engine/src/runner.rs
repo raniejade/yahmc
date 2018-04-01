@@ -30,8 +30,9 @@ impl Runner {
         api::install(&lua, &convention)?;
         lua.eval::<()>(
             r#"
-            local Vector = {x: 0, y: 0}
-            local Component = Engine:createComponent("Vector", Vector)
+            local Vector = {x = 0, y = 0}
+            local Component = Yahmc:createComponent("Vector", Vector)
+            local v = Component:new()
             "#,
             None,
         )?;
