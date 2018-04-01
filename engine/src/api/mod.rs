@@ -1,5 +1,3 @@
-mod lua;
-
 use convention::Convention;
 use rlua::{Lua, Result, Table, UserData, UserDataMethods};
 

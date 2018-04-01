@@ -7,6 +7,7 @@ extern crate rlua;
 #[cfg(test)]
 extern crate float_cmp;
 
+mod lua;
 mod api;
 mod convention;
 pub mod runner;
