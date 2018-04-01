@@ -6,7 +6,7 @@ pub use self::errors::Result;
 use std::path::{Path, PathBuf};
 
 pub struct Resource {
-    path: PathBuf
+    pub path: PathBuf
 }
 
 pub trait ResourceReader {}

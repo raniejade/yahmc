@@ -1,6 +1,5 @@
 use super::*;
 use std::path::PathBuf;
-use failure::Error;
 
 pub struct DiskResourceManager {
     root: PathBuf

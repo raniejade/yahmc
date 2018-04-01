@@ -1,5 +1,3 @@
-use failure::Error;
-
 #[derive(Debug, Fail)]
 pub enum ResourceError {
     #[fail(display = "Resource not found: {}", _0)]

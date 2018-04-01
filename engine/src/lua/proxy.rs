@@ -9,7 +9,7 @@ impl<'lua> ClassProxyBuilder<'lua> {
     }
 
     pub fn build(self, mt: Table) -> Result<Table<'lua>> {
-        self.1.set(constants::metamethod::INDEX, mt);
+        self.1.set(constants::metamethod::INDEX, mt)?;
         self.1
             .set_metatable(Some(self.1.get::<_, Table>(constants::metamethod::INDEX)?));
 
