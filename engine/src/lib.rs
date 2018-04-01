@@ -4,6 +4,9 @@
 extern crate log;
 extern crate rlua;
 
+#[cfg(test)]
+extern crate float_cmp;
+
 
 pub mod runner;
 mod convention;
