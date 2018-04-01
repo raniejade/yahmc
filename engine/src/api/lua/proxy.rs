@@ -1,4 +1,4 @@
-use rlua::{Lua, Table};
+use rlua::{Lua, Table, Result};
 use super::constants;
 
 pub struct ClassProxyBuilder<'lua>(&'lua Lua, Table<'lua>);
@@ -8,9 +8,9 @@ impl<'lua> ClassProxyBuilder<'lua> {
         return ClassProxyBuilder(lua, table);
     }
 
-    pub fn build(self, mt: Table) -> Table<'lua> {
+    pub fn build(self, mt: Table) -> Result<Table<'lua>> {
         self.1.set(constants::metamethod::INDEX, mt);
-        self.1.set_metatable(Some(self.1.get::<_, Table>(constants::metamethod::INDEX).unwrap()));
+        self.1.set_metatable(Some(self.1.get::<_, Table>(constants::metamethod::INDEX)?));
 
         let new = self.0.create_function(|lua, (this, o): (Table, Option<Table>)| {
             let object = o.unwrap_or(lua.create_table()?);
@@ -18,8 +18,8 @@ impl<'lua> ClassProxyBuilder<'lua> {
             Ok(object)
         }).unwrap();
 
-        self.1.set("new", new).unwrap();
-        return self.1;
+        self.1.set("new", new)?;
+        return Ok(self.1);
     }
 }
 
@@ -111,7 +111,8 @@ mod tests {
 
         // reload
         ClassProxyBuilder::create(&lua, vector_class)
-            .build(mt);
+            .build(mt)
+            .unwrap();
 
         let result = lua.exec::<i32>(
             r#"
@@ -158,7 +159,8 @@ mod tests {
 
         // reload
         ClassProxyBuilder::create(&lua, vector_class)
-            .build(mt);
+            .build(mt)
+            .unwrap();
 
         let result = lua.exec::<i32>(
             r#"
@@ -195,7 +197,8 @@ mod tests {
 
         let wrapper = lua.create_table().unwrap();
         let class = ClassProxyBuilder::create(&lua, wrapper)
-            .build(mt);
+            .build(mt)
+            .unwrap();
 
         globals.set(name.to_owned(), class);
 
