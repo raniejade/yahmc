@@ -1,25 +1,22 @@
-use std::path::PathBuf;
 use convention::Convention;
+use std::path::PathBuf;
 
-use rlua::{Lua, Result};
 use api;
+use rlua::{Lua, Result};
 
 pub struct RunnerSettings {
-    root: PathBuf
+    root: PathBuf,
 }
 
 impl RunnerSettings {
     pub fn create(root: PathBuf) -> RunnerSettings {
-        return RunnerSettings {
-            root: root
-        };
+        return RunnerSettings { root: root };
     }
 }
 
 pub struct Runner {
-    pub settings: RunnerSettings
+    pub settings: RunnerSettings,
 }
-
 
 impl Runner {
     pub fn run(self) -> Result<()> {
@@ -37,6 +34,6 @@ impl Runner {
             None,
         )?;
 
-        return Ok(())
+        return Ok(());
     }
 }

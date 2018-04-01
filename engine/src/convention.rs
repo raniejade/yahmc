@@ -5,7 +5,7 @@ pub struct Convention {
     pub root_dir: PathBuf,
     pub components_dir: PathBuf,
     pub processors_dir: PathBuf,
-    pub scripts_dir: PathBuf
+    pub scripts_dir: PathBuf,
 }
 
 impl Convention {
@@ -17,7 +17,7 @@ impl Convention {
             root_dir: root,
             components_dir,
             processors_dir,
-            scripts_dir
+            scripts_dir,
         };
     }
 }

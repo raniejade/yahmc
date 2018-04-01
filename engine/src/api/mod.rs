@@ -1,7 +1,7 @@
 mod lua;
 
-use rlua::{UserData, UserDataMethods, Lua, Result, Table};
 use convention::Convention;
+use rlua::{Lua, Result, Table, UserData, UserDataMethods};
 
 struct Api;
 
@@ -13,7 +13,12 @@ impl<'lua> Api {
         return Ok(String::from("as"));
     }
 
-    pub fn create_component(&self, lua: &'lua Lua, name: String, mt: Table<'lua>) -> Result<Table<'lua>> {
+    pub fn create_component(
+        &self,
+        lua: &'lua Lua,
+        name: String,
+        mt: Table<'lua>,
+    ) -> Result<Table<'lua>> {
         let globals = lua.globals();
         let component = lua.create_table()?;
 
@@ -26,7 +31,7 @@ impl<'lua> Api {
         component.set("__index", mt)?;
         component.set("new", new)?;
         globals.set(name.to_owned(), component)?;
-        
+
         return Ok(globals.get::<_, Table>(name)?);
     }
 }
@@ -34,7 +39,7 @@ impl<'lua> Api {
 pub fn install(lua: &Lua, convention: &Convention) -> Result<()> {
     let globals = lua.globals();
     globals.set("Yahmc", Api)?;
-    return Ok(())
+    return Ok(());
 }
 
 impl UserData for Api {
@@ -47,4 +52,4 @@ impl UserData for Api {
             api.create_component(lua, name, o)
         });
     }
-}   
+}

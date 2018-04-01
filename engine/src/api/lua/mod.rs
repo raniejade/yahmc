@@ -1,5 +1,5 @@
-mod registry;
 mod proxy;
+mod registry;
 
 pub use self::registry::ClassRegistry;
 

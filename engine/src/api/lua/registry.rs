@@ -13,12 +13,11 @@ impl<'lua> ClassRegistry<'lua> {
 
     pub fn get(&self, name: &String) -> Result<Table> {
         let internal_registry = self.get_internal_registry()?;
-        return internal_registry.get::<_, Table>(name.to_owned())
+        return internal_registry.get::<_, Table>(name.to_owned());
     }
 
     pub fn register(&self, name: &String, class: Table<'lua>) -> Result<()> {
-        self.get_internal_registry()?
-            .set(name.to_owned(), class)?;
+        self.get_internal_registry()?.set(name.to_owned(), class)?;
         return Ok(());
     }
 
