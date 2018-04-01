@@ -1,10 +1,7 @@
-local Vector = {x: 0.0, y: 0.0}
+local Vector = {x = 0, y = 0}
+            
+function Vector:magnitude()
+    return math.sqrt(self.x * self.x + self.y * self.y)
+end
 
-function Vector:new(object) {
-  object = object or {}
-  self.__index = self
-  setmetatable(object, self)
-  return object
-}
-
-return Engine:createComponent(Vector)
+return Vector
