@@ -1,6 +1,12 @@
 #![feature(pattern_parentheses)]
 
 #[macro_use]
+extern crate failure;
+#[macro_use]
+extern crate failure_derive;
+
+
+#[macro_use]
 extern crate log;
 extern crate rlua;
 
@@ -9,6 +15,7 @@ extern crate float_cmp;
 
 mod lua;
 mod api;
+mod resource;
 mod convention;
 pub mod runner;
 
