@@ -1,4 +1,5 @@
 use rlua::{Lua, Table};
+use super::constants;
 
 pub struct ClassProxyBuilder<'lua>(&'lua Lua, Table<'lua>);
 
@@ -8,8 +9,8 @@ impl<'lua> ClassProxyBuilder<'lua> {
     }
 
     pub fn build(self, mt: Table) -> Table<'lua> {
-        self.1.set("__index", mt);
-        self.1.set_metatable(Some(self.1.get::<_, Table>("__index").unwrap()));
+        self.1.set(constants::metamethod::INDEX, mt);
+        self.1.set_metatable(Some(self.1.get::<_, Table>(constants::metamethod::INDEX).unwrap()));
 
         let new = self.0.create_function(|lua, (this, o): (Table, Option<Table>)| {
             let object = o.unwrap_or(lua.create_table()?);
@@ -17,7 +18,7 @@ impl<'lua> ClassProxyBuilder<'lua> {
             Ok(object)
         }).unwrap();
 
-        self.1.set("new", new);
+        self.1.set("new", new).unwrap();
         return self.1;
     }
 }
@@ -31,7 +32,7 @@ mod tests {
     #[test]
     fn test_constructor() {
         let lua = Lua::new();
-        let vector_class = vector_class(&lua);
+        create_vector_class(&lua);
 
         let result = lua.exec::<Table>(
             r#"
@@ -50,7 +51,7 @@ mod tests {
     #[test]
     fn test_base_not_changed() {
         let lua = Lua::new();
-        let vector_class = vector_class(&lua);
+        create_vector_class(&lua);
 
         let result = lua.exec::<Table>(
             r#"
@@ -69,7 +70,7 @@ mod tests {
     #[test]
     fn test_method_call() {
         let lua = Lua::new();
-        let vector_class = vector_class(&lua);
+        create_vector_class(&lua);
 
         let result = lua.exec::<f32>(
             r#"
@@ -89,7 +90,7 @@ mod tests {
     #[test]
     fn test_reload() {
         let lua = Lua::new();
-        let vector_class = vector_class(&lua);
+        let vector_class = create_vector_class(&lua);
 
         let mt = lua.exec::<Table>(
             r#"
@@ -109,7 +110,7 @@ mod tests {
         ).unwrap();
 
         // reload
-        let class = ClassProxyBuilder::create(&lua, vector_class)
+        ClassProxyBuilder::create(&lua, vector_class)
             .build(mt);
 
         let result = lua.exec::<i32>(
@@ -128,7 +129,7 @@ mod tests {
     #[test]
     fn test_reload_existing_instance() {
         let lua = Lua::new();
-        let vector_class = vector_class(&lua);
+        let vector_class = create_vector_class(&lua);
         lua.eval::<()>(
             r#"
             v = Vector:new()
@@ -156,7 +157,7 @@ mod tests {
         ).unwrap();
 
         // reload
-        let class = ClassProxyBuilder::create(&lua, vector_class)
+        ClassProxyBuilder::create(&lua, vector_class)
             .build(mt);
 
         let result = lua.exec::<i32>(
@@ -169,7 +170,7 @@ mod tests {
         assert_eq!(3, result);
     }
 
-    fn vector_class<'lua>(lua: &'lua Lua) -> Table<'lua> {
+    fn create_vector_class<'lua>(lua: &'lua Lua) -> Table<'lua> {
         return create_class(
             &lua, 
             "Vector", 
