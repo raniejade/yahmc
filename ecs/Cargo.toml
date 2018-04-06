@@ -1,0 +1,11 @@
+[package]
+name = "ecs"
+version = "0.1.0"
+authors = ["Ranie Jade Ramiso <raniejaderamiso@gmail.com>"]
+
+[dependencies]
+log = "0.4.0"
+mopa = "0.2.2"
+fnv = "1.0.6"
+
+[dev-dependencies]
