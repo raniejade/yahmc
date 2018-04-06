@@ -96,8 +96,7 @@ impl Resources {
         if let Entry::Vacant(e) = entry {
             e.insert(RefCell::new(Box::new(resource)));
         } else {
-            panic!("Tried to add a resource though \
-                    an instance of this type already exists in `Resources`");
+            panic!("Resouce already exists!");
         }
     }
 
