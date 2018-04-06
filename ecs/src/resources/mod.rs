@@ -4,8 +4,10 @@ use std::default::Default;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 
-use fnv::FnvHashMap;
+use fxhash::FxHashMap;
 use mopa::Any;
+
+use super::system::SystemData;
 
 const RESOURCE_NOT_FOUND: &str = "No resource with the given id";
 
@@ -18,25 +20,24 @@ where T: Any + Send + Sync {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct ResourceId(pub TypeId, pub usize);
+pub struct ResourceId(pub TypeId);
 
 impl ResourceId {
     pub fn new<T: Resource>() -> Self {
-        Self::new_with_id::<T>(0)
+        ResourceId(TypeId::of::<T>())
     }
-
-    pub fn new_with_id<T: Resource>(id: usize) -> Self {
-        ResourceId(TypeId::of::<T>(), id)
-    }
-}
-
-trait ResourceData {
-    
 }
 
 pub struct Fetch<'a, T: 'a> {
     inner: Ref<'a, Box<Resource>>,
     phantom: PhantomData<&'a T>,
+}
+
+impl<'a, T: 'a> SystemData<'a> for Fetch<'a, T> 
+where T: Resource {
+    fn fetch(res: &'a Resources) -> Self {
+        res.fetch()
+    }
 }
 
 impl<'a, T> Deref for Fetch<'a, T>
@@ -53,6 +54,12 @@ pub struct FetchMut<'a, T: 'a> {
     phantom: PhantomData<&'a mut T>,
 }
 
+impl<'a, T: 'a> SystemData<'a> for FetchMut<'a, T> 
+where T: Resource {
+    fn fetch(res: &'a Resources) -> Self {
+        res.fetch_mut()
+    }
+}
 
 impl<'a, T> Deref for FetchMut<'a, T>
 where T: Resource {
@@ -72,7 +79,7 @@ where T: Resource {
 
 #[derive(Default)]
 pub struct Resources {
-    resources: FnvHashMap<ResourceId, RefCell<Box<Resource>>>
+    resources: FxHashMap<ResourceId, RefCell<Box<Resource>>>
 }
 
 impl Resources {
@@ -82,21 +89,15 @@ impl Resources {
 
     pub fn add<R>(&mut self, resource: R)
     where R: Resource {
-        self.add_with_id::<R>(resource, 0)
-    }
-
-    pub fn add_with_id<R>(&mut self, r: R, id: usize)
-    where
-        R: Resource,
-    {
         use std::collections::hash_map::Entry;
 
-        let entry = self.resources.entry(ResourceId::new_with_id::<R>(id));
+        let entry = self.resources.entry(ResourceId::new::<R>());
 
         if let Entry::Vacant(e) = entry {
-            e.insert(RefCell::new(Box::new(r)));
+            e.insert(RefCell::new(Box::new(resource)));
         } else {
-            panic!("Tried to add a resource though it is already registered");
+            panic!("Tried to add a resource though \
+                    an instance of this type already exists in `Resources`");
         }
     }
 
@@ -104,18 +105,18 @@ impl Resources {
         self.resources.contains_key(&res_id)
     }
 
-    pub fn fetch<T>(&self, id: usize) -> Fetch<T>
+    pub fn fetch<T>(&self) -> Fetch<T>
     where
         T: Resource,
     {
-        self.try_fetch(id).expect(RESOURCE_NOT_FOUND)
+        self.try_fetch().expect(RESOURCE_NOT_FOUND)
     }
 
-    pub fn try_fetch<T>(&self, id: usize) -> Option<Fetch<T>>
+    pub fn try_fetch<T>(&self) -> Option<Fetch<T>>
     where
         T: Resource,
     {
-        self.try_fetch_internal(TypeId::of::<T>(), id).map(|r| {
+        self.try_fetch_internal(TypeId::of::<T>()).map(|r| {
             Fetch {
                 inner: r.borrow(),
                 phantom: PhantomData,
@@ -123,18 +124,18 @@ impl Resources {
         })
     }
 
-    pub fn fetch_mut<T>(&self, id: usize) -> FetchMut<T>
+    pub fn fetch_mut<T>(&self) -> FetchMut<T>
     where
         T: Resource,
     {
-        self.try_fetch_mut(id).expect(RESOURCE_NOT_FOUND)
+        self.try_fetch_mut().expect(RESOURCE_NOT_FOUND)
     }
 
-    pub fn try_fetch_mut<T>(&self, id: usize) -> Option<FetchMut<T>>
+    pub fn try_fetch_mut<T>(&self) -> Option<FetchMut<T>>
     where
         T: Resource,
     {
-        self.try_fetch_internal(TypeId::of::<T>(), id).map(|r| {
+        self.try_fetch_internal(TypeId::of::<T>()).map(|r| {
             FetchMut {
                 inner: r.borrow_mut(),
                 phantom: PhantomData,
@@ -142,8 +143,8 @@ impl Resources {
         })
     }
 
-    fn try_fetch_internal(&self, id: TypeId, cid: usize) -> Option<&RefCell<Box<Resource>>> {
-        self.resources.get(&ResourceId(id, cid))
+    fn try_fetch_internal(&self, id: TypeId) -> Option<&RefCell<Box<Resource>>> {
+        self.resources.get(&ResourceId(id))
     }
 }
 
@@ -152,13 +153,13 @@ mod tests {
     use super::*;
 
     struct Res;
+    struct AnotherRes;
 
     #[test]
     fn res_id() {
-        assert_eq!(ResourceId::new::<Res>(), ResourceId::new_with_id::<Res>(0));
         assert_eq!(
-            ResourceId::new_with_id::<Res>(5),
-            ResourceId(TypeId::of::<Res>(), 5)
+            ResourceId::new::<Res>(),
+            ResourceId(TypeId::of::<Res>(),)
         );
     }
 
@@ -168,41 +169,28 @@ mod tests {
         res.add(Res);
 
         assert!(res.has_value(ResourceId::new::<Res>()));
-        assert!(!res.has_value(ResourceId::new_with_id::<Res>(1)));
-        assert!(!res.has_value(ResourceId::new_with_id::<Res>(1)));
+        assert!(!res.has_value(ResourceId::new::<AnotherRes>()));
     }
 
     #[test]
     fn fetch_uses_id() {
         let mut res = Resources::new();
-        res.add_with_id(5i32, 1);
-        res.add_with_id(50i32, 2);
+        res.add(5i32);
 
-        assert_eq!(*res.fetch::<i32>(1), 5);
-        assert_eq!(*res.fetch::<i32>(2), 50);
-
-        {
-            *res.fetch_mut::<i32>(1) *= 2;
-            *res.fetch_mut::<i32>(2) *= 2;
-        }
-
-        {
-            assert_eq!(*res.fetch::<i32>(1), 10);
-            assert_eq!(*res.fetch::<i32>(2), 100);
-        }
+        assert_eq!(*res.fetch::<i32>(), 5);
     }
 
     #[test]
     fn mutate() {
         let mut res = Resources::new();
-        res.add_with_id(5i32, 1);
+        res.add(5i32);
 
         {
-            *res.fetch_mut::<i32>(1) *= 2;
+            *res.fetch_mut::<i32>() *= 2;
         }
 
         {
-            assert_eq!(*res.fetch::<i32>(1), 10);
+            assert_eq!(*res.fetch::<i32>(), 10);
         }
     }
 }
