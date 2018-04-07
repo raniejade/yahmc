@@ -22,10 +22,7 @@ impl ComponentManager {
     where T: Component {
         use std::collections::hash_map::Entry;
 
-        let entry;
-        {
-            entry = self.1.entry(TypeId::of::<T>());
-        }
+        let entry = self.1.entry(TypeId::of::<T>());
 
         if let Entry::Vacant(e) = entry {
             let id = self.0.get();
