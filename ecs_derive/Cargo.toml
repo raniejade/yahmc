@@ -1,0 +1,11 @@
+[package]
+name = "ecs_derive"
+version = "0.1.0"
+authors = ["Ranie Jade Ramiso <raniejaderamiso@gmail.com>"]
+
+[dependencies]
+quote = "0.5.1"
+syn = "0.13.1"
+
+[lib]
+proc-macro = true
