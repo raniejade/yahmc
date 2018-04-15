@@ -3,7 +3,7 @@ use fxhash::FxHashMap;
 use std::any::TypeId;
 use std::default::Default;
 
-use super::component::{Component, ComponentId};
+use super::component::{Component};
 
 pub type Entity = usize;
 
