@@ -14,4 +14,3 @@ mod system;
 mod entity;
 mod component;
 mod storage;
-mod join;
