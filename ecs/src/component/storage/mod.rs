@@ -5,7 +5,7 @@ use std::default::Default;
 use std::iter::Iterator;
 use std::mem;
 
-use super::component::Component;
+use super::Component;
 
 pub type Index = usize;
 
