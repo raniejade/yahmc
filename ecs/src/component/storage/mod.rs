@@ -22,14 +22,10 @@ pub trait RawStorage<T: Component>: Default + Sized {
 }
 
 #[derive(Derivative)]
-#[derivative(Default(bound = ""))]
+#[derivative(Default(new = "true", bound = ""))]
 pub struct MaskedStorage<T: Component>(BitSet, T::Storage);
 
 impl<T: Component> MaskedStorage<T> {
-    pub fn new() -> MaskedStorage<T> {
-        Default::default()
-    }
-
     pub fn contains(&self, index: Index) -> bool {
         self.0.contains(index)
     }

@@ -7,8 +7,7 @@ use super::component::{Component};
 
 pub type Entity = usize;
 
-#[derive(Derivative)]
-#[derivative(Default(bound = ""))]
+#[derive(Default)]
 pub struct EntityStorage {
     next_id: usize,
     alive: BitSet,

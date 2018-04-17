@@ -1,19 +1,13 @@
 use super::*;
 
-#[derive(Default)]
-pub struct VecStorage<T: Component + Default> {
+#[derive(Derivative)]
+#[derivative(Default(new = "true", bound = ""))]
+pub struct VecStorage<T: Component> {
     vec: Vec<T>
 }
 
-impl<T> VecStorage<T>
-where T: Component + Default {
-    pub fn new() -> VecStorage<T> {
-        Default::default()
-    }
-}
-
 impl<T> RawStorage<T> for VecStorage<T>
-where T: Component + Default {
+where T: Component {
     fn get(&self, index: Index) -> &T {
         &self.vec[index]
     }
@@ -46,13 +40,11 @@ where T: Component + Default {
 mod tests {
     use super::*;
 
-    #[derive(Default)]
     struct MyComponent;
     impl Component for MyComponent {
         type Storage = VecStorage<Self>;
     }
 
-    #[derive(Default)]
     struct MyOtherComponent(i32);
     impl Component for MyOtherComponent {
         type Storage = VecStorage<Self>;
@@ -94,7 +86,7 @@ mod tests {
     #[test]
     fn vec_storage_get_mut() {
         let mut storage: VecStorage<MyOtherComponent> = VecStorage::new();
-        let component: MyOtherComponent = Default::default();
+        let component = MyOtherComponent(0);
         storage.insert(0, component);
         {
             let mut mutable_component = storage.get_mut(0);
