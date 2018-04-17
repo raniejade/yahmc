@@ -9,7 +9,7 @@ extern crate mopa;
 extern crate fxhash;
 extern crate bit_set;
 
-mod resources;
+mod resource;
 mod system;
 mod component;
 mod entity;

@@ -7,7 +7,7 @@ use super::component::Component;
 use super::component::storage::MaskedStorage;
 use super::entity::Entity;
 use super::system::SystemData;
-use super::resources::{Fetch, FetchMut, Resources};
+use super::resource::{Fetch, FetchMut, Resources};
 
 pub struct View<T, D>
 where T: Component {

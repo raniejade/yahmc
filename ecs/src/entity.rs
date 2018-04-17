@@ -4,7 +4,7 @@ use std::any::TypeId;
 use std::default::Default;
 
 use super::system::SystemData;
-use super::resources::{Fetch, FetchMut, Resources};
+use super::resource::{Fetch, FetchMut, Resources};
 
 pub type Entity = usize;
 
