@@ -6,7 +6,7 @@ extern crate quote;
 
 use proc_macro::TokenStream;
 use syn::punctuated::Pair;
-use syn::{DeriveInput, Meta, MetaList, NestedMeta};
+use syn::{DeriveInput, Meta, NestedMeta};
 
 #[proc_macro_derive(Component, attributes(Storage))]
 pub fn component_derive(input: TokenStream) -> TokenStream {

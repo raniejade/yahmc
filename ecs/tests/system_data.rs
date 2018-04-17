@@ -1,9 +1,5 @@
 extern crate ecs;
-#[macro_use]
-extern crate ecs_derive;
 
-use ecs::component::Component;
-use ecs::component::storage::VecStorage;
 use ecs::resource::Resources;
 use ecs::system::SystemData;
 use ecs::view::{ReadView, WriteView};
@@ -39,5 +35,6 @@ fn fetch_system_data_tuple() {
     let (some, mut another) =
         <(ReadView<SomeResource>, WriteView<AnotherResource>)>::fetch(&resources);
     assert_eq!(some.0, 0);
-    assert_eq!(another.0, 1);
+    another.0 = 2;
+    assert_eq!(another.0, 2);
 }
