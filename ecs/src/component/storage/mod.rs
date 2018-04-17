@@ -7,11 +7,16 @@ use std::mem;
 
 use super::Component;
 
+mod builtin;
+
+pub use self::builtin::VecStorage;
+
 pub type Index = usize;
 
 pub trait RawStorage<T: Component>: Default + Sized {
     fn get(&self, index: Index) -> &T;
-    fn get_mut(&self, index: Index) -> &mut T;
+    fn contains(&self, index: Index) -> bool;
+    fn get_mut(&mut self, index: Index) -> &mut T;
     fn insert(&mut self, index: Index, component: T);
     fn remove(&mut self, index: Index) -> T;
 }
@@ -37,7 +42,7 @@ impl<T: Component> MaskedStorage<T> {
         }
     }
 
-    pub fn get_mut(&self, index: Index) -> Option<&mut T> {
+    pub fn get_mut(&mut self, index: Index) -> Option<&mut T> {
         if self.contains(index) {
             Some(self.1.get_mut(index))
         } else {
