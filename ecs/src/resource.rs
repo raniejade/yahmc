@@ -152,13 +152,36 @@ mod tests {
     use super::*;
 
     struct Res;
+    impl Res {
+        pub fn foo(&self) {
+            println!("do nothing");
+        }
+    }
     struct AnotherRes;
+
+    #[test]
+    fn test_deref_coercion() {
+        let mut res = Resources::new();
+        res.add(Res);
+
+        let value = res.fetch::<Res>();
+        value.foo();
+    }
+
+    #[test]
+    fn test_deref_mut_coercion() {
+        let mut res = Resources::new();
+        res.add(Res);
+
+        let value = res.fetch_mut::<Res>();
+        value.foo();
+    }
 
     #[test]
     fn res_id() {
         assert_eq!(
             ResourceId::new::<Res>(),
-            ResourceId(TypeId::of::<Res>(),)
+            ResourceId(TypeId::of::<Res>())
         );
     }
 
