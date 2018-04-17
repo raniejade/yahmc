@@ -3,8 +3,8 @@ use fxhash::FxHashMap;
 use std::any::TypeId;
 use std::default::Default;
 
-use super::system::SystemData;
 use super::resource::{Fetch, FetchMut, Resources};
+use super::system::SystemData;
 
 pub type Entity = usize;
 
@@ -56,7 +56,7 @@ impl<'a> SystemData<'a> for Entities<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn create_entity() {
         let mut entity_storage = EntityStorage::new();
@@ -71,7 +71,7 @@ mod tests {
         entity_storage.destroy(entity);
         assert!(!entity_storage.is_alive(entity));
     }
-    
+
     #[test]
     #[should_panic]
     fn destroy_entity_dead() {
@@ -87,7 +87,7 @@ mod tests {
         let mut entity_storage = EntityStorage::new();
         let entity = entity_storage.create();
         entity_storage.destroy(entity);
-        
+
         let new_entity = entity_storage.create();
         assert_eq!(entity, new_entity);
     }

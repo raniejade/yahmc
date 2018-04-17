@@ -2,19 +2,23 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 
 use super::entity::Entity;
-use super::system::SystemData;
 use super::resource::{Fetch, FetchMut, Resource, Resources};
+use super::system::SystemData;
 
 pub struct View<R, D>
-where R: Resource {
+where
+    R: Resource,
+{
     data: D,
-    phantom: PhantomData<R>
+    phantom: PhantomData<R>,
 }
 
 pub type ReadView<'a, R> = View<R, Fetch<'a, R>>;
 
 impl<'a, R> Deref for ReadView<'a, R>
-where R: Resource {
+where
+    R: Resource,
+{
     type Target = R;
 
     fn deref(&self) -> &R {
@@ -23,12 +27,14 @@ where R: Resource {
 }
 
 impl<'a, R> SystemData<'a> for ReadView<'a, R>
-where R: Resource {
+where
+    R: Resource,
+{
     fn fetch(res: &'a Resources) -> Self {
         let data = res.fetch::<R>();
         View {
             data,
-            phantom: PhantomData
+            phantom: PhantomData,
         }
     }
 }
@@ -36,7 +42,9 @@ where R: Resource {
 pub type WriteView<'a, R> = View<R, FetchMut<'a, R>>;
 
 impl<'a, R> Deref for WriteView<'a, R>
-where R: Resource {
+where
+    R: Resource,
+{
     type Target = R;
 
     fn deref(&self) -> &R {
@@ -45,19 +53,23 @@ where R: Resource {
 }
 
 impl<'a, R> DerefMut for WriteView<'a, R>
-where R: Resource {
+where
+    R: Resource,
+{
     fn deref_mut(&mut self) -> &mut R {
         &mut self.data
     }
 }
 
 impl<'a, R> SystemData<'a> for WriteView<'a, R>
-where R: Resource {
+where
+    R: Resource,
+{
     fn fetch(res: &'a Resources) -> Self {
         let data = res.fetch_mut::<R>();
         View {
             data,
-            phantom: PhantomData
+            phantom: PhantomData,
         }
     }
 }
@@ -105,7 +117,8 @@ mod tests {
         let mut resources = Resources::new();
         resources.add(SomeResource::new());
         resources.add(AnotherResource);
-        let some_resource = <(ReadView<SomeResource>,ReadView<AnotherResource>)>::fetch(&resources);
+        let some_resource =
+            <(ReadView<SomeResource>, ReadView<AnotherResource>)>::fetch(&resources);
         assert_eq!(some_resource.0.get(), 0);
     }
 }

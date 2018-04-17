@@ -1,12 +1,12 @@
-mod errors;
 mod disk;
+mod errors;
 
 pub use self::errors::Result;
 
 use std::path::{Path, PathBuf};
 
 pub struct Resource {
-    pub path: PathBuf
+    pub path: PathBuf,
 }
 
 pub trait ResourceReader {}
@@ -20,5 +20,4 @@ pub trait ResourceManager {
 
     fn reader() -> Self::R;
     fn writer() -> Self::W;
-
 }

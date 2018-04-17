@@ -1,5 +1,5 @@
 use std::any::TypeId;
-use std::cell::{Ref, RefMut, RefCell};
+use std::cell::{Ref, RefCell, RefMut};
 use std::default::Default;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -15,8 +15,10 @@ pub trait Resource: Any + Send + Sync {}
 
 mopafy!(Resource);
 
-impl<T> Resource for T 
-where T: Any + Send + Sync {
+impl<T> Resource for T
+where
+    T: Any + Send + Sync,
+{
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -33,7 +35,7 @@ pub struct Fetch<'a, T: 'a> {
     phantom: PhantomData<&'a T>,
 }
 
-// impl<'a, T: 'a> SystemData<'a> for Fetch<'a, T> 
+// impl<'a, T: 'a> SystemData<'a> for Fetch<'a, T>
 // where T: Resource {
 //     fn fetch(res: &'a Resources) -> Self {
 //         res.fetch()
@@ -41,7 +43,9 @@ pub struct Fetch<'a, T: 'a> {
 // }
 
 impl<'a, T> Deref for Fetch<'a, T>
-where T: Resource {
+where
+    T: Resource,
+{
     type Target = T;
 
     fn deref(&self) -> &T {
@@ -54,7 +58,7 @@ pub struct FetchMut<'a, T: 'a> {
     phantom: PhantomData<&'a mut T>,
 }
 
-// impl<'a, T: 'a> SystemData<'a> for FetchMut<'a, T> 
+// impl<'a, T: 'a> SystemData<'a> for FetchMut<'a, T>
 // where T: Resource {
 //     fn fetch(res: &'a Resources) -> Self {
 //         res.fetch_mut()
@@ -62,7 +66,9 @@ pub struct FetchMut<'a, T: 'a> {
 // }
 
 impl<'a, T> Deref for FetchMut<'a, T>
-where T: Resource {
+where
+    T: Resource,
+{
     type Target = T;
 
     fn deref(&self) -> &T {
@@ -71,7 +77,9 @@ where T: Resource {
 }
 
 impl<'a, T> DerefMut for FetchMut<'a, T>
-where T: Resource {
+where
+    T: Resource,
+{
     fn deref_mut(&mut self) -> &mut T {
         unsafe { self.inner.downcast_mut_unchecked() }
     }
@@ -79,7 +87,7 @@ where T: Resource {
 
 #[derive(Default)]
 pub struct Resources {
-    resources: FxHashMap<ResourceId, RefCell<Box<Resource>>>
+    resources: FxHashMap<ResourceId, RefCell<Box<Resource>>>,
 }
 
 impl Resources {
@@ -88,7 +96,9 @@ impl Resources {
     }
 
     pub fn add<R>(&mut self, resource: R)
-    where R: Resource {
+    where
+        R: Resource,
+    {
         use std::collections::hash_map::Entry;
 
         let entry = self.resources.entry(ResourceId::new::<R>());
@@ -115,11 +125,9 @@ impl Resources {
     where
         T: Resource,
     {
-        self.try_fetch_internal(TypeId::of::<T>()).map(|r| {
-            Fetch {
-                inner: r.borrow(),
-                phantom: PhantomData,
-            }
+        self.try_fetch_internal(TypeId::of::<T>()).map(|r| Fetch {
+            inner: r.borrow(),
+            phantom: PhantomData,
         })
     }
 
@@ -134,12 +142,11 @@ impl Resources {
     where
         T: Resource,
     {
-        self.try_fetch_internal(TypeId::of::<T>()).map(|r| {
-            FetchMut {
+        self.try_fetch_internal(TypeId::of::<T>())
+            .map(|r| FetchMut {
                 inner: r.borrow_mut(),
                 phantom: PhantomData,
-            }
-        })
+            })
     }
 
     fn try_fetch_internal(&self, id: TypeId) -> Option<&RefCell<Box<Resource>>> {
@@ -179,10 +186,7 @@ mod tests {
 
     #[test]
     fn res_id() {
-        assert_eq!(
-            ResourceId::new::<Res>(),
-            ResourceId(TypeId::of::<Res>())
-        );
+        assert_eq!(ResourceId::new::<Res>(), ResourceId(TypeId::of::<Res>()));
     }
 
     #[test]

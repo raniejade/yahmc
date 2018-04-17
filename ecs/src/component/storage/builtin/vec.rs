@@ -3,11 +3,13 @@ use super::*;
 #[derive(Derivative)]
 #[derivative(Default(new = "true", bound = ""))]
 pub struct VecStorage<T: Component> {
-    vec: Vec<T>
+    vec: Vec<T>,
 }
 
 impl<T> RawStorage<T> for VecStorage<T>
-where T: Component {
+where
+    T: Component,
+{
     fn get(&self, index: Index) -> &T {
         &self.vec[index]
     }
@@ -15,7 +17,7 @@ where T: Component {
     fn contains(&self, index: Index) -> bool {
         match self.vec.get(index) {
             Some(_) => true,
-            None => false
+            None => false,
         }
     }
 

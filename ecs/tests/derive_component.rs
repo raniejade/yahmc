@@ -12,5 +12,8 @@ struct MyComponent(i32);
 
 #[test]
 fn storage_match() {
-    assert_eq!(TypeId::of::<VecStorage<MyComponent>>(), TypeId::of::<<MyComponent as Component>::Storage>());
+    assert_eq!(
+        TypeId::of::<VecStorage<MyComponent>>(),
+        TypeId::of::<<MyComponent as Component>::Storage>()
+    );
 }

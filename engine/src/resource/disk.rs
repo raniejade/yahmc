@@ -2,7 +2,7 @@ use super::*;
 use std::path::PathBuf;
 
 pub struct DiskResourceManager {
-    root: PathBuf
+    root: PathBuf,
 }
 
 impl ResourceManager for DiskResourceManager {
@@ -21,7 +21,6 @@ impl ResourceManager for DiskResourceManager {
         return DiskResourceWriter;
     }
 }
-
 
 pub struct DiskResourceReader;
 pub struct DiskResourceWriter;

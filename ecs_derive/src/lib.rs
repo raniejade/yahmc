@@ -5,8 +5,8 @@ extern crate syn;
 extern crate quote;
 
 use proc_macro::TokenStream;
-use syn::{DeriveInput, Meta, MetaList, NestedMeta};
 use syn::punctuated::Pair;
+use syn::{DeriveInput, Meta, MetaList, NestedMeta};
 
 #[proc_macro_derive(Component, attributes(Storage))]
 pub fn component_derive(input: TokenStream) -> TokenStream {
@@ -19,16 +19,16 @@ pub fn component_derive(input: TokenStream) -> TokenStream {
     // extracts (value)
     let pair = match meta {
         Meta::List(mut list) => list.nested.pop().unwrap(),
-        _ => panic!("expected Meta::List!")
+        _ => panic!("expected Meta::List!"),
     };
     let punc = pair.into_value();
     // extracts value
     let storage = match punc {
         NestedMeta::Meta(meta) => match meta {
             Meta::Word(ident) => ident,
-            _ => panic!("expected Meta::Word")
+            _ => panic!("expected Meta::Word"),
         },
-        _ => panic!("expected Nested::Meta")
+        _ => panic!("expected Nested::Meta"),
     };
 
     let expanded = quote! {

@@ -4,7 +4,6 @@ extern crate failure;
 #[macro_use]
 extern crate failure_derive;
 
-
 #[macro_use]
 extern crate log;
 extern crate rlua;
@@ -12,10 +11,10 @@ extern crate rlua;
 #[cfg(test)]
 extern crate float_cmp;
 
-mod lua;
 mod api;
-mod resource;
 mod convention;
+mod lua;
+mod resource;
 pub mod runner;
 
 use runner::{Runner, RunnerSettings};

@@ -6,11 +6,11 @@ extern crate derivative;
 
 #[macro_use]
 extern crate mopa;
-extern crate fxhash;
 extern crate bit_set;
+extern crate fxhash;
 
-pub mod resource;
-pub mod system;
 pub mod component;
 pub mod entity;
+pub mod resource;
+pub mod system;
 pub mod view;
