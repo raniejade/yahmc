@@ -7,7 +7,8 @@ use super::component::{Component};
 
 pub type Entity = usize;
 
-#[derive(Default)]
+#[derive(Derivative)]
+#[derivative(Default(new = "true"))]
 pub struct EntityStorage {
     next_id: usize,
     alive: BitSet,
@@ -15,10 +16,6 @@ pub struct EntityStorage {
 }
 
 impl EntityStorage {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn create(&mut self) -> Entity {
         let id = if (!self.limbo.is_empty()) {
             self.limbo.remove(0)

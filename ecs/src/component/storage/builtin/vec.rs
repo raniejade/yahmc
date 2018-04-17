@@ -89,7 +89,7 @@ mod tests {
         let component = MyOtherComponent(0);
         storage.insert(0, component);
         {
-            let mut mutable_component = storage.get_mut(0);
+            let mutable_component = storage.get_mut(0);
             mutable_component.0 = 100;
         }
         let updated_component = storage.get(0);
