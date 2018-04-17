@@ -3,7 +3,8 @@ use fxhash::FxHashMap;
 use std::any::TypeId;
 use std::default::Default;
 
-use super::component::{Component};
+use super::system::SystemData;
+use super::resources::{Fetch, FetchMut, Resources};
 
 pub type Entity = usize;
 
@@ -41,6 +42,14 @@ impl EntityStorage {
         let id = self.next_id;
         self.next_id = id + 1;
         id
+    }
+}
+
+pub type Entities<'a> = FetchMut<'a, EntityStorage>;
+
+impl<'a> SystemData<'a> for Entities<'a> {
+    fn fetch(res: &'a Resources) -> Self {
+        res.fetch_mut::<EntityStorage>()
     }
 }
 
