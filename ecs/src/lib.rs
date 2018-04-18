@@ -20,6 +20,7 @@ use component::storage::MaskedStorage;
 use entity::Entities;
 use resource::Resources;
 use system::{System, SystemData};
+use view::ReadView;
 
 
 trait SystemRunner<'a> {

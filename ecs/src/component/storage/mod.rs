@@ -21,11 +21,13 @@ pub trait RawStorage<T: Component>: Default + Sized {
     fn remove(&mut self, index: Index) -> T;
 }
 
-#[derive(Derivative)]
-#[derivative(Default(new = "true", bound = ""))]
 pub struct MaskedStorage<T: Component>(BitSet, T::Storage);
 
 impl<T: Component> MaskedStorage<T> {
+    pub fn new() -> Self {
+        MaskedStorage(Default::default(), Default::default())
+    }
+    
     pub fn contains(&self, index: Index) -> bool {
         self.0.contains(index)
     }
