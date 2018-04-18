@@ -10,13 +10,13 @@ pub type Entity = usize;
 
 #[derive(Derivative)]
 #[derivative(Default(new = "true"))]
-pub struct EntityStorage {
+pub struct Entities {
     next_id: usize,
     alive: BitSet,
     limbo: Vec<usize>,
 }
 
-impl EntityStorage {
+impl Entities {
     pub fn create(&mut self) -> Entity {
         let id = if (!self.limbo.is_empty()) {
             self.limbo.remove(0)
@@ -51,14 +51,14 @@ mod tests {
 
     #[test]
     fn create_entity() {
-        let mut entity_storage = EntityStorage::new();
+        let mut entity_storage = Entities::new();
         let entity = entity_storage.create();
         assert!(entity_storage.is_alive(entity));
     }
 
     #[test]
     fn destroy_entity() {
-        let mut entity_storage = EntityStorage::new();
+        let mut entity_storage = Entities::new();
         let entity = entity_storage.create();
         entity_storage.destroy(entity);
         assert!(!entity_storage.is_alive(entity));
@@ -67,7 +67,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn destroy_entity_dead() {
-        let mut entity_storage = EntityStorage::new();
+        let mut entity_storage = Entities::new();
         let entity = entity_storage.create();
         entity_storage.destroy(entity);
         // some time later
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn re_use_dead_entity() {
-        let mut entity_storage = EntityStorage::new();
+        let mut entity_storage = Entities::new();
         let entity = entity_storage.create();
         entity_storage.destroy(entity);
 
