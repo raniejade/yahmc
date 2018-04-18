@@ -17,6 +17,7 @@ pub mod view;
 
 use component::Component;
 use component::storage::MaskedStorage;
+use entity::Entities;
 use resource::Resources;
 use system::{System, SystemData};
 
@@ -35,37 +36,51 @@ where
     }
 }
 
-pub struct World<'a> {
-    resources: Resources,
-    systems: Vec<Box<SystemRunner<'a> + 'a>>
+pub struct World {
+    pub(crate) resources: Resources
 }
 
-impl<'a> World<'a> {
+impl World {
     pub fn new() -> Self {
+        let mut resources = Resources::new();
+        resources.add(Entities::new());
         World { 
-            resources: Resources::new(),
-            systems: Vec::new()
+            resources
          }
     }
 
-    pub fn register_component<T>(&mut self) -> &mut Self
+    pub fn register<T>(&mut self) -> &mut Self
     where
         T: Component
     {
         self.resources.add(<MaskedStorage<T>>::new());
         self
     }
+}
 
-    pub fn register_system<T>(&mut self, system: T) -> &mut Self 
+// The only reason we have this type is because
+// we can't do a self borrow.
+pub struct Dispatcher<'a> {
+    systems: Vec<Box<SystemRunner<'a> + 'a>>
+}
+
+impl<'a> Dispatcher<'a> {
+    pub fn new() -> Self {
+        Dispatcher {
+            systems: Vec::new()
+        }
+    }
+
+    pub fn register<T>(&mut self, system: T) -> &mut Self 
     where T: 'a + System<'a> {
         self.systems.push(Box::new(system));
         self
     }
 
-    pub fn run(&'a mut self) {
+    pub fn dispatch(&mut self, world: &'a World) {
         let systems = self.systems.iter_mut();
         for system in systems {
-            system.run(&self.resources);
+            system.run(&world.resources);
         }
     }
 }

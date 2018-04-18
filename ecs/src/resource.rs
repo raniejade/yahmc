@@ -35,13 +35,6 @@ pub struct Fetch<'a, T: 'a> {
     phantom: PhantomData<&'a T>,
 }
 
-// impl<'a, T: 'a> SystemData<'a> for Fetch<'a, T>
-// where T: Resource {
-//     fn fetch(res: &'a Resources) -> Self {
-//         res.fetch()
-//     }
-// }
-
 impl<'a, T> Deref for Fetch<'a, T>
 where
     T: Resource,
@@ -57,13 +50,6 @@ pub struct FetchMut<'a, T: 'a> {
     inner: RefMut<'a, Box<Resource>>,
     phantom: PhantomData<&'a mut T>,
 }
-
-// impl<'a, T: 'a> SystemData<'a> for FetchMut<'a, T>
-// where T: Resource {
-//     fn fetch(res: &'a Resources) -> Self {
-//         res.fetch_mut()
-//     }
-// }
 
 impl<'a, T> Deref for FetchMut<'a, T>
 where
