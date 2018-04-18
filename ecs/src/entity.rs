@@ -45,14 +45,6 @@ impl EntityStorage {
     }
 }
 
-pub type Entities<'a> = FetchMut<'a, EntityStorage>;
-
-impl<'a> SystemData<'a> for Entities<'a> {
-    fn fetch(res: &'a Resources) -> Self {
-        res.fetch_mut::<EntityStorage>()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
