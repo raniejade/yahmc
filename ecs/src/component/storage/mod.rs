@@ -1,8 +1,5 @@
 use bit_set::BitSet;
-use bit_set::Iter;
-use std::any::Any;
 use std::default::Default;
-use std::iter::Iterator;
 use std::mem;
 
 use super::Component;
