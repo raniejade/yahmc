@@ -1,11 +1,11 @@
 pub mod storage;
 
 use std::any::Any;
-use std::ops::{Deref, DerefMut};
 use std::marker::PhantomData;
+use std::ops::{Deref, DerefMut};
 
-use self::storage::{RawStorage, MaskedStorage};
-use super::entity::{Entity, Entities};
+use self::storage::{MaskedStorage, RawStorage};
+use super::entity::{Entities, Entity};
 use super::resource::{Fetch, FetchMut, Resources};
 use super::system::SystemData;
 
@@ -39,7 +39,7 @@ pub type ReadStorage<'a, T> = Storage<'a, T, Fetch<'a, MaskedStorage<T>>>;
 impl<'a, T, D> Storage<'a, T, D>
 where
     T: Component,
-    D: Deref<Target=MaskedStorage<T>>
+    D: Deref<Target = MaskedStorage<T>>,
 {
     pub fn contains(&self, entity: Entity) -> bool {
         self.entities.assert_alive(entity);
@@ -72,9 +72,8 @@ pub type WriteStorage<'a, T> = Storage<'a, T, FetchMut<'a, MaskedStorage<T>>>;
 impl<'a, T, D> Storage<'a, T, D>
 where
     T: Component,
-    D: DerefMut<Target=MaskedStorage<T>>
+    D: DerefMut<Target = MaskedStorage<T>>,
 {
-
     pub fn get_mut(&mut self, entity: Entity) -> Option<&mut T> {
         self.entities.assert_alive(entity);
         self.data.get_mut(entity)
@@ -108,8 +107,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use self::storage::VecStorage;
+    use super::*;
 
     #[derive(Component)]
     #[Storage(VecStorage)]

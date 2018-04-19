@@ -2,12 +2,12 @@ extern crate ecs;
 #[macro_use]
 extern crate ecs_derive;
 
-use ecs::{World, Dispatcher};
-use ecs::component::{Component, WriteStorage};
 use ecs::component::storage::VecStorage;
+use ecs::component::{Component, WriteStorage};
 use ecs::entity::Entities;
 use ecs::system::System;
 use ecs::view::{ReadView, WriteView};
+use ecs::{Dispatcher, World};
 
 #[derive(Component)]
 #[Storage(VecStorage)]

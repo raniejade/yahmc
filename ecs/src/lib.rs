@@ -22,7 +22,6 @@ use resource::Resources;
 use system::{System, SystemData};
 use view::ReadView;
 
-
 trait SystemRunner<'a> {
     fn run(&mut self, resources: &'a Resources);
 }
@@ -30,7 +29,7 @@ trait SystemRunner<'a> {
 impl<'a, T, S> SystemRunner<'a> for S
 where
     T: SystemData<'a>,
-    S: System<'a, SystemData=T>
+    S: System<'a, SystemData = T>,
 {
     fn run(&mut self, resources: &'a Resources) {
         self.run(<T>::fetch(resources))
@@ -38,21 +37,19 @@ where
 }
 
 pub struct World {
-    pub(crate) resources: Resources
+    pub(crate) resources: Resources,
 }
 
 impl World {
     pub fn new() -> Self {
         let mut resources = Resources::new();
         resources.add(Entities::new());
-        World { 
-            resources
-         }
+        World { resources }
     }
 
     pub fn register<T>(&mut self) -> &mut Self
     where
-        T: Component
+        T: Component,
     {
         self.resources.add(<MaskedStorage<T>>::new());
         self
@@ -62,18 +59,20 @@ impl World {
 // The only reason we have this type is because
 // we can't do a self borrow.
 pub struct Dispatcher<'a> {
-    systems: Vec<Box<SystemRunner<'a> + 'a>>
+    systems: Vec<Box<SystemRunner<'a> + 'a>>,
 }
 
 impl<'a> Dispatcher<'a> {
     pub fn new() -> Self {
         Dispatcher {
-            systems: Vec::new()
+            systems: Vec::new(),
         }
     }
 
-    pub fn register<T>(&mut self, system: T) -> &mut Self 
-    where T: 'a + System<'a> {
+    pub fn register<T>(&mut self, system: T) -> &mut Self
+    where
+        T: 'a + System<'a>,
+    {
         self.systems.push(Box::new(system));
         self
     }

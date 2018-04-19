@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use super::resource::{Resources};
+use super::resource::Resources;
 
 pub trait System<'a> {
     type SystemData: SystemData<'a>;

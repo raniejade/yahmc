@@ -24,7 +24,7 @@ impl<T: Component> MaskedStorage<T> {
     pub fn new() -> Self {
         MaskedStorage(Default::default(), Default::default())
     }
-    
+
     pub fn contains(&self, index: Index) -> bool {
         self.0.contains(index)
     }
