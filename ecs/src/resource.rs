@@ -7,8 +7,6 @@ use std::ops::{Deref, DerefMut};
 use fxhash::FxHashMap;
 use mopa::Any;
 
-use super::system::SystemData;
-
 const RESOURCE_NOT_FOUND: &str = "No resource with the given id";
 
 pub trait Resource: Any + Send + Sync {}

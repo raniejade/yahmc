@@ -6,7 +6,6 @@ use ecs::component::storage::VecStorage;
 use ecs::component::{Component, WriteStorage};
 use ecs::entity::Entities;
 use ecs::system::System;
-use ecs::view::{ReadView, WriteView};
 use ecs::{Dispatcher, World};
 
 #[derive(Component)]
@@ -16,7 +15,7 @@ struct MyComponent(i32);
 struct MySystem;
 
 impl<'a> System<'a> for MySystem {
-    type SystemData = (ReadView<'a, Entities>, WriteStorage<'a, MyComponent>);
+    type SystemData = (Entities<'a>, WriteStorage<'a, MyComponent>);
 
     fn run(&mut self, (entities, mut components): Self::SystemData) {
         // nada

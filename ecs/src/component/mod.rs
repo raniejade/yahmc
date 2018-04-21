@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 
 use self::storage::{MaskedStorage, RawStorage};
-use super::entity::{Entities, Entity};
+use super::entity::{EntityStorage, Entity};
 use super::resource::{Fetch, FetchMut, Resources};
 use super::system::SystemData;
 
@@ -17,7 +17,7 @@ trait EntityChecker {
     fn assert_alive(&self, entity: Entity);
 }
 
-impl EntityChecker for Entities {
+impl EntityChecker for EntityStorage {
     fn assert_alive(&self, entity: Entity) {
         if !self.is_alive(entity) {
             panic!("Entity {} is not alive.", entity);
@@ -29,7 +29,7 @@ pub struct Storage<'a, T, D>
 where
     T: Component,
 {
-    entities: Fetch<'a, Entities>,
+    entities: Fetch<'a, EntityStorage>,
     data: D,
     phantom: PhantomData<T>,
 }
@@ -57,7 +57,7 @@ where
     T: Component,
 {
     fn fetch(res: &'a Resources) -> Self {
-        let entities = res.fetch::<Entities>();
+        let entities = res.fetch::<EntityStorage>();
         let data = res.fetch::<MaskedStorage<T>>();
         Storage {
             entities,
@@ -95,7 +95,7 @@ where
     T: Component,
 {
     fn fetch(res: &'a Resources) -> Self {
-        let entities = res.fetch::<Entities>();
+        let entities = res.fetch::<EntityStorage>();
         let data = res.fetch_mut::<MaskedStorage<T>>();
         Storage {
             entities,
@@ -121,7 +121,7 @@ mod tests {
     #[should_panic]
     fn contains_dead_entity() {
         let mut resources = Resources::new();
-        resources.add(Entities::new());
+        resources.add(EntityStorage::new());
         resources.add(<MaskedStorage<MyComponent>>::new());
         let storage = MyReadStorage::fetch(&resources);
         storage.contains(0);
@@ -131,7 +131,7 @@ mod tests {
     #[should_panic]
     fn get_dead_entity() {
         let mut resources = Resources::new();
-        resources.add(Entities::new());
+        resources.add(EntityStorage::new());
         resources.add(<MaskedStorage<MyComponent>>::new());
         let storage = MyReadStorage::fetch(&resources);
         storage.get(0);
@@ -141,7 +141,7 @@ mod tests {
     #[should_panic]
     fn get_mut_dead_entity() {
         let mut resources = Resources::new();
-        resources.add(Entities::new());
+        resources.add(EntityStorage::new());
         resources.add(<MaskedStorage<MyComponent>>::new());
         let mut storage = MyWriteStorage::fetch(&resources);
         storage.get_mut(0);
@@ -151,7 +151,7 @@ mod tests {
     #[should_panic]
     fn insert_dead_entity() {
         let mut resources = Resources::new();
-        resources.add(Entities::new());
+        resources.add(EntityStorage::new());
         resources.add(<MaskedStorage<MyComponent>>::new());
         let mut storage = MyWriteStorage::fetch(&resources);
         storage.insert(0, MyComponent);
@@ -161,7 +161,7 @@ mod tests {
     #[should_panic]
     fn remove_dead_entity() {
         let mut resources = Resources::new();
-        resources.add(Entities::new());
+        resources.add(EntityStorage::new());
         resources.add(<MaskedStorage<MyComponent>>::new());
         let mut storage = MyWriteStorage::fetch(&resources);
         storage.remove(0);

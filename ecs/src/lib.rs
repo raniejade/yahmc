@@ -13,14 +13,12 @@ pub mod component;
 pub mod entity;
 pub mod resource;
 pub mod system;
-pub mod view;
 
 use component::Component;
 use component::storage::MaskedStorage;
-use entity::Entities;
+use entity::EntityStorage;
 use resource::Resources;
 use system::{System, SystemData};
-use view::ReadView;
 
 trait SystemRunner<'a> {
     fn run(&mut self, resources: &'a Resources);
@@ -43,7 +41,7 @@ pub struct World {
 impl World {
     pub fn new() -> Self {
         let mut resources = Resources::new();
-        resources.add(Entities::new());
+        resources.add(EntityStorage::new());
         World { resources }
     }
 

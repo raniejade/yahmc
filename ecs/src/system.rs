@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use super::resource::Resources;
+use super::resource::{Fetch, FetchMut, Resource, Resources};
 
 pub trait System<'a> {
     type SystemData: SystemData<'a>;
@@ -15,6 +15,24 @@ pub trait SystemData<'a> {
 impl<'a, T: ?Sized> SystemData<'a> for PhantomData<T> {
     fn fetch(_: &'a Resources) -> Self {
         PhantomData
+    }
+}
+
+impl<'a, R> SystemData<'a> for Fetch<'a, R>
+where
+    R: Resource,
+{
+    fn fetch(res: &'a Resources) -> Self {
+        res.fetch::<R>()
+    }
+}
+
+impl<'a, R> SystemData<'a> for FetchMut<'a, R>
+where
+    R: Resource,
+{
+    fn fetch(res: &'a Resources) -> Self {
+        res.fetch_mut::<R>()
     }
 }
 
