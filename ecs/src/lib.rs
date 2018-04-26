@@ -1,3 +1,5 @@
+#![feature(concat_idents)] 
+
 #[macro_use]
 extern crate ecs_derive;
 
@@ -7,12 +9,14 @@ extern crate derivative;
 #[macro_use]
 extern crate mopa;
 extern crate bit_set;
+extern crate bit_vec;
 extern crate fxhash;
 
 pub mod component;
 pub mod entity;
 pub mod resource;
 pub mod system;
+pub mod join;
 
 use component::Component;
 use component::storage::MaskedStorage;

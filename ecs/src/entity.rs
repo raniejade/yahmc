@@ -1,11 +1,8 @@
 use bit_set::BitSet;
-use fxhash::FxHashMap;
-use std::any::TypeId;
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex, MutexGuard, LockResult};
 
 use super::resource::Fetch;
-use super::system::SystemData;
 
 pub type Entity = usize;
 
@@ -23,7 +20,7 @@ const LOCK_POISOINED: &str = "Lock is poisoned!";
 
 impl EntityStorage {
     pub fn create(&self) -> Entity {
-        let id = if (!self.is_limbo_empty()) {
+        let id = if !self.is_limbo_empty() {
             // self.limbo.remove(0);
             self.unlock_mut(self.limbo.lock(), |limbo: &mut Vec<usize>| {
                 limbo.remove(0)
