@@ -1,7 +1,7 @@
-use bit_set::{BitSet};
-use bit_vec::{IntoIter};
+use bit_set::BitSet;
+use std::vec::IntoIter;
 
-trait Join {
+pub trait Join {
     type Item;
 
     fn open(&self) -> BitSet;
@@ -13,12 +13,12 @@ trait Join {
         JoinIterator::new(self)
     }
 
-    fn get(&self, index: u32) -> Self::Item;
+    fn get(&self, index: usize) -> Self::Item;
 }
 
-struct JoinIterator<T: Join> {
-    keys: IntoIter<u32>,
-    join: T
+pub struct JoinIterator<T: Join> {
+    keys: IntoIter<usize>,
+    join: T,
 }
 
 impl<T> JoinIterator<T>
@@ -27,8 +27,12 @@ where
 {
     pub fn new(join: T) -> Self {
         let keys = join.open();
+        let mut vec = Vec::new();
+        for key in keys.iter() {
+            vec.push(key);
+        }
         JoinIterator {
-            keys: keys.into_bit_vec().into_iter(),
+            keys: vec.into_iter(),
             join
         }
     }
@@ -42,7 +46,7 @@ where
 
     fn next(&mut self) -> Option<T::Item> {
         self.keys.next()
-            .map(|idx| { self.join.get(idx as u32) })
+            .map(|idx| { self.join.get(idx) })
     }
 }
 
@@ -53,13 +57,17 @@ macro_rules! impl_data {
         {
             type Item = ( $($ty::Item,)* );
             fn open(&self) -> BitSet {
+                #![allow(unused_variables, non_snake_case)]
+
                 let mut base = BitSet::new();
                 let ( $($ty, )* ) = self;
                 $( base.intersect_with(&$ty.open()); )*
                 base
             }
 
-            fn get(&self, index: u32) -> Self::Item {
+            fn get(&self, index: usize) -> Self::Item {
+                #![allow(unused_variables, non_snake_case)]
+
                 let ( $($ty,)* ) = self;
                 ( $( $ty.get(index), )* )
             }

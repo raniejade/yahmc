@@ -3,6 +3,7 @@ use std::default::Default;
 use std::mem;
 
 use super::Component;
+use super::super::join::Join;
 
 mod builtin;
 
@@ -20,9 +21,15 @@ pub trait RawStorage<T: Component>: Default + Sized {
 
 pub struct MaskedStorage<T: Component>(BitSet, T::Storage);
 
-impl<T: Component> MaskedStorage<T> {
+impl<T> MaskedStorage<T> 
+where T: Component,
+{
     pub fn new() -> Self {
         MaskedStorage(Default::default(), Default::default())
+    }
+
+    pub fn entities(&self) -> BitSet {
+        self.0.clone()
     }
 
     pub fn contains(&self, index: Index) -> bool {
