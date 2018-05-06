@@ -1,0 +1,9 @@
+[package]
+name = "ecs2"
+version = "0.1.0"
+authors = ["Ranie Jade Ramiso <raniejaderamiso@gmail.com>"]
+
+[dependencies]
+bit-set = "0.5.0"
+bit-vec = "0.5.0"
+fxhash = "0.2.1"
