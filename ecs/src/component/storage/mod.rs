@@ -3,7 +3,6 @@ use std::default::Default;
 use std::mem;
 
 use super::Component;
-use super::super::join::Join;
 
 mod builtin;
 

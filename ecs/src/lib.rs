@@ -16,7 +16,6 @@ pub mod component;
 pub mod entity;
 pub mod resource;
 pub mod system;
-pub mod join;
 
 use component::Component;
 use component::storage::MaskedStorage;

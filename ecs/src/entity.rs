@@ -1,7 +1,6 @@
 use bit_set::BitSet;
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex, MutexGuard, LockResult};
-use super::join::Join;
 
 use super::resource::Fetch;
 
