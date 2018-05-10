@@ -7,13 +7,17 @@ use super::component::{Component, ComponentId, ComponentManager};
 
 pub type Entity = usize;
 
-pub struct EntityEditor {
-    pub entity: Entity
+pub struct EntityEditor<'a> {
+    pub entity: Entity,
+    entity_manager: &'a EntityManager
 }
 
-impl EntityEditor {
-    fn new(entity: Entity) -> Self {
-        unimplemented!();
+impl<'a> EntityEditor<'a> {
+    fn new(entity: Entity, entity_manager: &'a EntityManager) -> Self {
+        EntityEditor {
+            entity,
+            entity_manager
+        }
     }
 
     pub fn add<T: Component>(&mut self, component: T) {
@@ -65,7 +69,10 @@ impl EntityManager {
     }
 
     pub fn editor(&mut self, entity: Entity) -> EntityEditor {
-        unimplemented!();
+        if !self.storage.is_alive(entity) {
+            panic!("Entity {} not alived!", entity);
+        }
+        EntityEditor::new(entity, self)
     }
 
     pub fn register<T: Aspect>(&mut self) {
@@ -336,5 +343,20 @@ mod tests {
         index.update(&component_manager, entity, &bits);
 
         assert!(!index.entities::<MyAspect>(&component_manager).contains(&entity));
+    }
+
+    #[test]
+    fn entity_manager_existing() {
+        let mut entity_manager = EntityManager::new();
+        let entity = entity_manager.create().entity;
+
+        assert_eq!(entity, entity_manager.editor(entity).entity);
+    }
+
+    #[test]
+    #[should_panic]
+    fn entity_manager_not_existing() {
+        let mut entity_manager = EntityManager::new();
+        entity_manager.editor(1);
     }
 }
