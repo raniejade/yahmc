@@ -50,7 +50,7 @@ impl Matcher {
         }
     }
 
-    fn check(&self, manager: &ComponentManager, bits: &BitSet) -> bool {
+    pub fn check(&self, manager: &ComponentManager, bits: &BitSet) -> bool {
         self.req.intersection(&bits).count() == self.req.len()
             && self.not.intersection(&bits).count() == 0
     }

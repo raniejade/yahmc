@@ -59,7 +59,7 @@ impl EntityManager {
         // fuck the borrow checker
         {
             let bits = self.states.get(entity, true);
-            self.index.update(entity, bits);
+            self.index.update(&self.component_manager, entity, bits);
         }
         self.editor(entity)
     }
@@ -103,14 +103,41 @@ impl AspectIndex {
     }
 
     fn register<T: Aspect>(&mut self, component_manager: &ComponentManager) {
-        let matcher = Matcher::new::<T>(component_manager);        
+        let matcher = Matcher::new::<T>(component_manager);
         // TODO: should we fail if it exists?
         if !self.index.contains_key(&matcher) {
             self.index.insert(matcher, BitSet::new());
         }
     }
 
-    fn update(&mut self, entity: Entity, bits: &BitSet) {}
+    fn update(&mut self, component_manager: &ComponentManager, entity: Entity, bits: &BitSet) {
+        for (matcher, entities) in self.index.iter_mut() {
+            if entities.contains(entity) {
+                if !matcher.check(component_manager, bits) {
+                    entities.remove(entity);
+                }
+            } else {
+                if matcher.check(component_manager, bits) {
+                    entities.insert(entity);
+                }
+            }
+        }
+    }
+
+    fn entities<T: Aspect>(&self, component_manager: &ComponentManager) -> Vec<Entity> {
+        let matcher = Matcher::new::<T>(component_manager);
+
+        if self.index.contains_key(&matcher) {
+            let mut result = Vec::new();
+            let index = self.index.get(&matcher).unwrap();
+            for entity in index.iter() {
+                result.push(entity);
+            }
+            return result
+        }
+
+        panic!("Aspect not registered!");
+    }
 }
 
 #[derive(Default)]
@@ -153,6 +180,22 @@ impl EntityStorage {
     fn next_id(&mut self) -> Entity {
         self.next_id = self.next_id + 1;
         self.next_id
+    }
+}
+
+trait ComponentSetter {
+    fn set_bit(component_manager: &ComponentManager, bits: &mut BitSet);
+    fn unset_bit(component_manager: &ComponentManager, bits: &mut BitSet);
+}
+
+impl<T> ComponentSetter for T
+where T: Component {
+    fn set_bit(component_manager: &ComponentManager, bits: &mut BitSet) {
+        bits.insert(component_manager.id::<T>());
+    }
+
+    fn unset_bit(component_manager: &ComponentManager, bits: &mut BitSet) {
+        bits.remove(component_manager.id::<T>());
     }
 }
 
@@ -215,5 +258,83 @@ mod tests {
         let mut states = EntityStates::new();
         states.get(0, false).insert(1);
         assert!(!states.get(0, true).contains(1));
+    }
+
+    struct MyComponent;
+    impl Component for MyComponent {}
+
+    struct AnotherComponent;
+    impl Component for AnotherComponent {}
+
+    #[test]
+    fn aspect_index_initially_empty() {
+        let mut component_manager = ComponentManager::new();
+        component_manager.register::<MyComponent>();
+        component_manager.register::<AnotherComponent>();
+
+        let mut index = AspectIndex::new();
+
+        type MyAspect = (MyComponent, AnotherComponent);
+
+        index.register::<MyAspect>(&component_manager);
+        assert!(index.entities::<MyAspect>(&component_manager).is_empty());
+    }
+
+    #[test]
+    #[should_panic]
+    fn aspect_index_not_registered() {
+        let mut component_manager = ComponentManager::new();
+        component_manager.register::<MyComponent>();
+        component_manager.register::<AnotherComponent>();
+
+        let mut index = AspectIndex::new();
+
+        type MyAspect = (MyComponent, AnotherComponent);
+
+        index.entities::<MyAspect>(&component_manager);
+    }
+
+    #[test]
+    fn aspect_index_insert() {
+        let mut component_manager = ComponentManager::new();
+        component_manager.register::<MyComponent>();
+        component_manager.register::<AnotherComponent>();
+
+        let mut index = AspectIndex::new();
+        type MyAspect = (MyComponent, AnotherComponent);
+        index.register::<MyAspect>(&component_manager);
+
+        let entity = 1;
+        let mut bits = BitSet::new();
+        MyComponent::set_bit(&component_manager, &mut bits);
+        AnotherComponent::set_bit(&component_manager, &mut bits);
+
+        index.update(&component_manager, entity, &bits);
+
+        assert!(index.entities::<MyAspect>(&component_manager).contains(&entity));
+    }
+
+    #[test]
+    fn aspect_index_removal() {
+        let mut component_manager = ComponentManager::new();
+        component_manager.register::<MyComponent>();
+        component_manager.register::<AnotherComponent>();
+
+        let mut index = AspectIndex::new();
+        type MyAspect = (MyComponent, AnotherComponent);
+        index.register::<MyAspect>(&component_manager);
+
+        let entity = 1;
+        let mut bits = BitSet::new();
+        // first pass
+        MyComponent::set_bit(&component_manager, &mut bits);
+        AnotherComponent::set_bit(&component_manager, &mut bits);
+        index.update(&component_manager, entity, &bits);
+
+        // sometime later
+        AnotherComponent::unset_bit(&component_manager, &mut bits);
+        index.update(&component_manager, entity, &bits);
+
+        assert!(!index.entities::<MyAspect>(&component_manager).contains(&entity));
     }
 }
