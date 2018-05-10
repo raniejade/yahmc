@@ -1,12 +1,12 @@
 use std::time::Duration;
 
-use super::aspect::Aspect;
+use super::context::Context;
 use super::entity::Entity;
 
 pub trait System {
     type Aspect;
 
-    fn process(&self, duration: Duration, entities: Vec<Entity>);
+    fn process(&self, context: &mut Context, duration: Duration, entities: Vec<Entity>);
 }
 
 #[cfg(test)]
@@ -27,7 +27,7 @@ mod tests {
     impl System for MySystem {
         type Aspect = (MyComponent, Not<AnotherComponent>);
 
-        fn process(&self, duration: Duration, entities: Vec<Entity>) {}
+        fn process(&self, context: &mut Context, duration: Duration, entities: Vec<Entity>) {}
     }
 
     #[test]
