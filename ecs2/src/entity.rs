@@ -9,11 +9,11 @@ pub type Entity = usize;
 
 pub struct EntityEditor<'a> {
     pub entity: Entity,
-    entity_manager: &'a EntityManager
+    entity_manager: &'a mut EntityManager
 }
 
 impl<'a> EntityEditor<'a> {
-    fn new(entity: Entity, entity_manager: &'a EntityManager) -> Self {
+    fn new(entity: Entity, entity_manager: &'a mut EntityManager) -> Self {
         EntityEditor {
             entity,
             entity_manager
@@ -21,27 +21,31 @@ impl<'a> EntityEditor<'a> {
     }
 
     pub fn add<T: Component>(&mut self, component: T) {
-        unimplemented!();
+        self.entity_manager.add(self.entity, component);
     }
 
     pub fn remove<T: Component>(&mut self) -> T {
-        unimplemented!();
+        self.entity_manager.remove(self.entity)
     }
 
     pub fn contains<T: Component>(&self) -> bool {
-        unimplemented!();
+        self.entity_manager.contains::<T>(self.entity)
     }
 
     pub fn get<T: Component>(&self) -> Option<&T> {
-        unimplemented!();
+        self.entity_manager.get::<T>(self.entity)
     }
 
     pub fn get_mut<T: Component>(&mut self) -> Option<&mut T> {
-        unimplemented!();
+        self.entity_manager.get_mut::<T>(self.entity)
     }
 
     pub fn destroy(mut self) {
-        unimplemented!();
+        self.entity_manager.destroy(self.entity);
+    }
+
+    pub fn commit(mut self) {
+        self.entity_manager.commit(self.entity);
     }
 }
 
@@ -78,6 +82,39 @@ impl EntityManager {
     pub fn register<T: Aspect>(&mut self) {
         self.index.register::<T>(&self.component_manager)
     }
+
+    // entity manipulation methods
+    fn add<T: Component>(&mut self, entity: Entity, component: T) {
+        unimplemented!();
+    }
+
+    fn remove<T: Component>(&mut self, entity: Entity) -> T {
+        unimplemented!();
+    }
+
+    fn contains<T: Component>(&self, entity: Entity) -> bool {
+        unimplemented!();
+    }
+
+    fn get<T: Component>(&self, entity: Entity) -> Option<&T> {
+        unimplemented!();
+    }
+
+    fn get_mut<T: Component>(&mut self, entity: Entity) -> Option<&mut T> {
+        unimplemented!();
+    }
+
+    fn destroy(&mut self, entity: Entity) {
+        self.storage.destroy(entity);
+        // clear state
+        self.states.get(entity, true);
+        self.index.remove(&self.component_manager, entity);
+    }
+
+    fn commit(&mut self, entity: Entity) {
+        let bits = self.states.get(entity, false);
+        self.index.update(&self.component_manager, entity, bits);
+    }
 }
 
 #[derive(Default)]
@@ -90,8 +127,8 @@ impl EntityStates {
         Default::default()
     }
 
-    fn get(&mut self, entity: Entity, init: bool) -> &mut BitSet {
-        if !self.state.contains_key(&entity) || init {
+    fn get(&mut self, entity: Entity, reset: bool) -> &mut BitSet {
+        if !self.state.contains_key(&entity) || reset {
             self.state.insert(entity, BitSet::new());
         }
 
@@ -128,6 +165,12 @@ impl AspectIndex {
                     entities.insert(entity);
                 }
             }
+        }
+    }
+
+    fn remove(&mut self, component_manager: &ComponentManager, entity: Entity) {
+        for (_, entities) in self.index.iter_mut() {
+            entities.remove(entity);
         }
     }
 
@@ -341,6 +384,29 @@ mod tests {
         // sometime later
         AnotherComponent::unset_bit(&component_manager, &mut bits);
         index.update(&component_manager, entity, &bits);
+
+        assert!(!index.entities::<MyAspect>(&component_manager).contains(&entity));
+    }
+
+    #[test]
+    fn aspect_index_explicit_removal() {
+        let mut component_manager = ComponentManager::new();
+        component_manager.register::<MyComponent>();
+        component_manager.register::<AnotherComponent>();
+
+        let mut index = AspectIndex::new();
+        type MyAspect = (MyComponent, AnotherComponent);
+        index.register::<MyAspect>(&component_manager);
+
+        let entity = 1;
+        let mut bits = BitSet::new();
+        // first pass
+        MyComponent::set_bit(&component_manager, &mut bits);
+        AnotherComponent::set_bit(&component_manager, &mut bits);
+        index.update(&component_manager, entity, &bits);
+
+        // sometime later
+        index.remove(&component_manager, entity);
 
         assert!(!index.entities::<MyAspect>(&component_manager).contains(&entity));
     }
