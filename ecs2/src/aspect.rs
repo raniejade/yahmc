@@ -36,6 +36,21 @@ where
     }
 }
 
+pub(crate) trait Matcher {
+    fn check(manager: &ComponentManager, bits: &BitSet) -> bool;
+}
+
+impl<T> Matcher for T
+where T: Aspect {
+    fn check(manager: &ComponentManager, bits: &BitSet) -> bool {
+        let req = <T>::req(manager);
+        let not = <T>::not(manager);
+
+        req.intersection(&bits).count() == req.len()
+            && not.intersection(&bits).count() == 0
+    }
+}
+
 macro_rules! impl_aspect {
     ( $($ty:ident),* ) => {
         impl<$($ty),*> Aspect for ( $( $ty , )* )
@@ -134,5 +149,41 @@ mod tests {
 
         assert_eq!(expected, <(MyComponent, Not<AnotherComponent>)>::not(&manager));
         assert_ne!(expected, <(MyComponent, Not<AnotherComponent>)>::req(&manager));
+    }
+
+    #[test]
+    fn check() {
+        let mut manager = ComponentManager::new();
+        manager.register::<MyComponent>();
+        manager.register::<AnotherComponent>();
+
+        let mut bits = BitSet::new();
+        bits.insert(manager.id::<MyComponent>());
+
+        assert!(<(MyComponent, Not<AnotherComponent>)>::check(&manager, &bits));
+    }
+
+    #[test]
+    fn check_has_excluded() {
+        let mut manager = ComponentManager::new();
+        manager.register::<MyComponent>();
+        manager.register::<AnotherComponent>();
+
+        let mut bits = BitSet::new();
+        bits.insert(manager.id::<MyComponent>());
+        bits.insert(manager.id::<AnotherComponent>());
+
+        assert!(!<(MyComponent, Not<AnotherComponent>)>::check(&manager, &bits));
+    }
+
+    #[test]
+    fn check_no_required() {
+        let mut manager = ComponentManager::new();
+        manager.register::<MyComponent>();
+        manager.register::<AnotherComponent>();
+
+        let mut bits = BitSet::new();
+
+        assert!(!<(MyComponent, Not<AnotherComponent>)>::check(&manager, &bits));
     }
 }

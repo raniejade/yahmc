@@ -1,7 +1,8 @@
 use bit_set::BitSet;
+use fxhash::FxHashMap;
 use std::default::Default;
 
-use super::component::Component;
+use super::component::{Component, ComponentId, ComponentManager};
 
 pub type Entity = usize;
 
@@ -10,6 +11,10 @@ pub struct EntityEditor {
 }
 
 impl EntityEditor {
+    fn new(entity: Entity) -> Self {
+        unimplemented!();
+    }
+
     pub fn add<T: Component>(&mut self, component: T) {
         unimplemented!();
     }
@@ -35,12 +40,25 @@ impl EntityEditor {
     }
 }
 
+#[derive(Default)]
 pub(crate) struct EntityManager {
-
+    storage: EntityStorage,
+    state: FxHashMap<Entity, BitSet>,
+    pub component_manager: ComponentManager
 }
 
 impl EntityManager {
+    pub fn new() -> Self {
+        Default::default()
+    }
 
+    pub fn create(&mut self) -> EntityEditor {
+        unimplemented!();
+    }
+
+    pub fn editor(&mut self, entity: Entity) -> EntityEditor {
+        unimplemented!();
+    }
 }
 
 #[derive(Default)]
