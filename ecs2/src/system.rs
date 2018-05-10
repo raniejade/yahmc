@@ -12,15 +12,22 @@ pub trait System {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::storage::VecStorage;
     use aspect::{Aspect, Not};
     use component::{Component, ComponentManager};
     use entity::Entity;
 
+    #[derive(Default)]
     struct MyComponent;
-    impl Component for MyComponent {}
+    impl Component for MyComponent {
+        type Storage = VecStorage<Self>;
+    }
 
+    #[derive(Default)]
     struct AnotherComponent;
-    impl Component for AnotherComponent {}
+    impl Component for AnotherComponent {
+        type Storage = VecStorage<Self>;
+    }
 
     struct MySystem;
 
@@ -37,7 +44,7 @@ mod tests {
         manager.register::<AnotherComponent>();
 
         // all good as long as this compiles
-        let (_req, _not) = (<MySystem as System>::Aspect::req(&manager), 
+        let (_req, _not) = (<MySystem as System>::Aspect::req(&manager),
                             <MySystem as System>::Aspect::not(&manager));
     }
 }

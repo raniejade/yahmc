@@ -1,10 +1,14 @@
 use std::any::{Any, TypeId};
 use std::default::Default;
-
 use fxhash::FxHashMap;
 
-pub trait Component: Any + Send + Sync {
+use super::storage::Storage;
 
+pub trait Component
+where
+    Self: Sized + Any + Send + Sync + Default
+{
+    type Storage: Storage<Self>;
 }
 
 pub(crate) type ComponentId = usize;
@@ -25,7 +29,7 @@ impl ComponentManager {
         T: Component
     {
         use std::collections::hash_map::Entry;
-        
+
         let entry = self.ids.entry(TypeId::of::<T>());
 
         if let Entry::Vacant(e) = entry {
@@ -49,11 +53,19 @@ impl ComponentManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    struct MyComponent;
-    impl Component for MyComponent {}
+    use super::super::storage::VecStorage;
 
+    #[derive(Default)]
+    struct MyComponent;
+    impl Component for MyComponent {
+        type Storage = VecStorage<Self>;
+    }
+
+    #[derive(Default)]
     struct AnotherComponent;
-    impl Component for AnotherComponent {}
+    impl Component for AnotherComponent {
+        type Storage = VecStorage<Self>;
+    }
 
     #[test]
     fn registered() {

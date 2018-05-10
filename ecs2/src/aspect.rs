@@ -117,12 +117,19 @@ mod impl_aspect {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::*;
-    struct MyComponent;
-    impl Component for MyComponent {}
+    use super::super::storage::VecStorage;
 
+    #[derive(Default)]
+    struct MyComponent;
+    impl Component for MyComponent {
+        type Storage = VecStorage<Self>;
+    }
+
+    #[derive(Default)]
     struct AnotherComponent;
-    impl Component for AnotherComponent {}
+    impl Component for AnotherComponent {
+        type Storage = VecStorage<Self>;
+    }
 
     #[test]
     fn req() {

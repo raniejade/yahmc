@@ -310,11 +310,19 @@ mod tests {
         assert!(!states.get(0, true).contains(1));
     }
 
-    struct MyComponent;
-    impl Component for MyComponent {}
+    use super::super::storage::VecStorage;
 
+    #[derive(Default)]
+    struct MyComponent;
+    impl Component for MyComponent {
+        type Storage = VecStorage<Self>;
+    }
+
+    #[derive(Default)]
     struct AnotherComponent;
-    impl Component for AnotherComponent {}
+    impl Component for AnotherComponent {
+        type Storage = VecStorage<Self>;
+    }
 
     #[test]
     fn aspect_index_initially_empty() {
