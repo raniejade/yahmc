@@ -2,6 +2,7 @@ use bit_set::BitSet;
 use fxhash::FxHashMap;
 use std::default::Default;
 
+use super::aspect::{Aspect, Matcher};
 use super::component::{Component, ComponentId, ComponentManager};
 
 pub type Entity = usize;
@@ -43,7 +44,8 @@ impl EntityEditor {
 #[derive(Default)]
 pub(crate) struct EntityManager {
     storage: EntityStorage,
-    state: FxHashMap<Entity, BitSet>,
+    states: EntityStates,
+    index: AspectIndex,
     pub component_manager: ComponentManager
 }
 
@@ -53,12 +55,62 @@ impl EntityManager {
     }
 
     pub fn create(&mut self) -> EntityEditor {
-        unimplemented!();
+        let entity = self.storage.create();
+        // fuck the borrow checker
+        {
+            let bits = self.states.get(entity, true);
+            self.index.update(entity, bits);
+        }
+        self.editor(entity)
     }
 
     pub fn editor(&mut self, entity: Entity) -> EntityEditor {
         unimplemented!();
     }
+
+    pub fn register<T: Aspect>(&mut self) {
+        self.index.register::<T>(&self.component_manager)
+    }
+}
+
+#[derive(Default)]
+struct EntityStates {
+    state: FxHashMap<Entity, BitSet>
+}
+
+impl EntityStates {
+    fn new() -> Self {
+        Default::default()
+    }
+
+    fn get(&mut self, entity: Entity, init: bool) -> &mut BitSet {
+        if !self.state.contains_key(&entity) || init {
+            self.state.insert(entity, BitSet::new());
+        }
+
+        self.state.get_mut(&entity).expect("state not found!")
+    }
+}
+
+#[derive(Default)]
+struct AspectIndex {
+    index: FxHashMap<Matcher, BitSet>
+}
+
+impl AspectIndex {
+    fn new() -> Self {
+        Default::default()
+    }
+
+    fn register<T: Aspect>(&mut self, component_manager: &ComponentManager) {
+        let matcher = Matcher::new::<T>(component_manager);        
+        // TODO: should we fail if it exists?
+        if !self.index.contains_key(&matcher) {
+            self.index.insert(matcher, BitSet::new());
+        }
+    }
+
+    fn update(&mut self, entity: Entity, bits: &BitSet) {}
 }
 
 #[derive(Default)]
@@ -143,5 +195,25 @@ mod tests {
     fn entity_storage_destroy_dead() {
         let mut storage = EntityStorage::new();
         storage.destroy(1);
+    }
+
+    #[test]
+    fn entity_states_get_not_existing() {
+        let mut states = EntityStates::new();
+        assert_eq!(0, states.get(0, false).len());
+    }
+
+    #[test]
+    fn entity_states_get_existing() {
+        let mut states = EntityStates::new();
+        states.get(0, false).insert(1);
+        assert!(states.get(0, false).contains(1));
+    }
+
+    #[test]
+    fn entity_states_get_existing_init() {
+        let mut states = EntityStates::new();
+        states.get(0, false).insert(1);
+        assert!(!states.get(0, true).contains(1));
     }
 }

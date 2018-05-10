@@ -36,18 +36,23 @@ where
     }
 }
 
-pub(crate) trait Matcher {
-    fn check(manager: &ComponentManager, bits: &BitSet) -> bool;
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub(crate) struct Matcher {
+    req: BitSet,
+    not: BitSet
 }
 
-impl<T> Matcher for T
-where T: Aspect {
-    fn check(manager: &ComponentManager, bits: &BitSet) -> bool {
-        let req = <T>::req(manager);
-        let not = <T>::not(manager);
+impl Matcher {
+    pub fn new<T: Aspect>(manager: &ComponentManager) -> Self {
+        Matcher {
+            req: <T>::req(manager),
+            not: <T>::not(manager)
+        }
+    }
 
-        req.intersection(&bits).count() == req.len()
-            && not.intersection(&bits).count() == 0
+    fn check(&self, manager: &ComponentManager, bits: &BitSet) -> bool {
+        self.req.intersection(&bits).count() == self.req.len()
+            && self.not.intersection(&bits).count() == 0
     }
 }
 
@@ -159,8 +164,8 @@ mod tests {
 
         let mut bits = BitSet::new();
         bits.insert(manager.id::<MyComponent>());
-
-        assert!(<(MyComponent, Not<AnotherComponent>)>::check(&manager, &bits));
+        let matcher = Matcher::new::<(MyComponent, Not<AnotherComponent>)>(&manager);
+        assert!(matcher.check(&manager, &bits));
     }
 
     #[test]
@@ -172,8 +177,8 @@ mod tests {
         let mut bits = BitSet::new();
         bits.insert(manager.id::<MyComponent>());
         bits.insert(manager.id::<AnotherComponent>());
-
-        assert!(!<(MyComponent, Not<AnotherComponent>)>::check(&manager, &bits));
+        let matcher = Matcher::new::<(MyComponent, Not<AnotherComponent>)>(&manager);
+        assert!(!matcher.check(&manager, &bits));
     }
 
     #[test]
@@ -183,7 +188,7 @@ mod tests {
         manager.register::<AnotherComponent>();
 
         let mut bits = BitSet::new();
-
-        assert!(!<(MyComponent, Not<AnotherComponent>)>::check(&manager, &bits));
+        let matcher = Matcher::new::<(MyComponent, Not<AnotherComponent>)>(&manager);
+        assert!(!matcher.check(&manager, &bits));
     }
 }
