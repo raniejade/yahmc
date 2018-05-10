@@ -90,7 +90,7 @@ mod tests {
     fn get_not_existing() {
         let entity = 1;
         let mut storage: VecStorage<MyComponent> = VecStorage::new();
-        // value undefined since Storage API is unsafe
+        // data maybe all zeroes
         storage.get(entity);
     }
 
@@ -102,7 +102,7 @@ mod tests {
         storage.add(entity, MyComponent(1));
         storage.remove(entity);
 
-        // value undefined since Storage API is unsafe
+        // data maybe all zeroes
         storage.get(entity);
     }
 }
