@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 use bit_set::BitSet;
-use super::component::{Component, ComponentManager};
+use component::{Component, ComponentManager};
 
 pub(crate) trait Aspect {
     fn req(_manager: &ComponentManager) -> BitSet {

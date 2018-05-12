@@ -1,7 +1,7 @@
 use std::default::Default;
 
-use super::entity::Entity;
-use super::component::Component;
+use entity::Entity;
+use component::Component;
 
 pub trait Storage<T>: Default
 where

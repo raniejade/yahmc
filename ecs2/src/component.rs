@@ -2,7 +2,7 @@ use std::any::{Any, TypeId};
 use std::default::Default;
 use fxhash::FxHashMap;
 
-use super::storage::Storage;
+use storage::Storage;
 
 pub trait Component
 where

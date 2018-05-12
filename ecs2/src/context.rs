@@ -1,3 +1,4 @@
+use aspect::Aspect;
 use entity::{Entity, EntityEditor};
 use component::Component;
 
@@ -15,6 +16,10 @@ impl Context {
     }
 
     pub fn is_alive(&self, entity: Entity) -> bool {
+        unimplemented!();
+    }
+
+    pub(crate) fn get_entities<T: Aspect>(&self) -> Vec<Entity> {
         unimplemented!();
     }
 }

@@ -2,8 +2,8 @@ use bit_set::BitSet;
 use fxhash::FxHashMap;
 use std::default::Default;
 
-use super::aspect::{Aspect, Matcher};
-use super::component::{Component, ComponentId, ComponentManager};
+use aspect::{Aspect, Matcher};
+use component::{Component, ComponentId, ComponentManager};
 
 pub type Entity = usize;
 
