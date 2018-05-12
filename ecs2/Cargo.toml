@@ -7,3 +7,4 @@ authors = ["Ranie Jade Ramiso <raniejaderamiso@gmail.com>"]
 bit-set = "0.5.0"
 bit-vec = "0.5.0"
 fxhash = "0.2.1"
+mopa = "0.2.2"

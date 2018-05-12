@@ -3,7 +3,7 @@ use fxhash::FxHashMap;
 use std::default::Default;
 
 use aspect::{Aspect, Matcher};
-use component::{Component, ComponentId, ComponentManager};
+use component::{Component, ComponentManager};
 
 pub type Entity = usize;
 
@@ -51,7 +51,7 @@ impl<'a> EntityEditor<'a> {
 
 #[derive(Default)]
 pub(crate) struct EntityManager {
-    storage: EntityStorage,
+    entity_storage: EntityStorage,
     states: EntityStates,
     index: AspectIndex,
     pub component_manager: ComponentManager,
@@ -63,7 +63,7 @@ impl EntityManager {
     }
 
     pub fn create(&mut self) -> EntityEditor {
-        let entity = self.storage.create();
+        let entity = self.entity_storage.create();
         // fuck the borrow checker
         {
             let bits = self.states.get(entity, true);
@@ -73,7 +73,7 @@ impl EntityManager {
     }
 
     pub fn editor(&mut self, entity: Entity) -> EntityEditor {
-        if !self.storage.is_alive(entity) {
+        if !self.entity_storage.is_alive(entity) {
             panic!("Entity {} not alived!", entity);
         }
         EntityEditor::new(entity, self)
@@ -84,7 +84,7 @@ impl EntityManager {
     }
 
     pub fn is_alive(&self, entity: Entity) -> bool {
-        self.storage.is_alive(entity)
+        self.entity_storage.is_alive(entity)
     }
 
     pub fn register<T: Aspect>(&mut self) {
@@ -113,7 +113,7 @@ impl EntityManager {
     }
 
     fn destroy(&mut self, entity: Entity) {
-        self.storage.destroy(entity);
+        self.entity_storage.destroy(entity);
         // clear state
         self.states.get(entity, true);
         self.index.remove(&self.component_manager, entity);
@@ -248,7 +248,7 @@ trait ComponentSetter {
 
 impl<T> ComponentSetter for T
 where
-    T: Component,
+    T: Component + 'static,
 {
     fn set_bit(component_manager: &ComponentManager, bits: &mut BitSet) {
         bits.insert(component_manager.id::<T>());

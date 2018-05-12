@@ -1,5 +1,9 @@
+#[macro_use]
+extern crate mopa;
 extern crate bit_set;
 extern crate fxhash;
+
+mod resource;
 
 pub mod aspect;
 pub mod component;
@@ -43,7 +47,10 @@ impl<'a> WorldBuilder<'a> {
         }
     }
 
-    pub fn register_component<T: Component>(&mut self) {
+    pub fn register_component<T>(&mut self)
+    where
+        T: Component + 'static
+    {
         self.entity_manager.component_manager.register::<T>();
     }
 

@@ -31,10 +31,12 @@ where
     }
 }
 
-impl<T> Storage<T> for VecStorage<T>
+impl<T> Storage for VecStorage<T>
 where
     T: Component,
 {
+    type Type = T;
+
     fn get(&self, entity: Entity) -> &T {
         &self.components[entity]
     }

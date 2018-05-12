@@ -1,14 +1,15 @@
 use fxhash::FxHashMap;
 use std::any::{Any, TypeId};
 use std::default::Default;
+use std::cell::{RefCell, RefMut};
 
 use storage::Storage;
 
 pub trait Component
 where
-    Self: Sized + Any + Send + Sync + Default,
+    Self: Sized
 {
-    type Storage: Storage<Self>;
+    type Storage: Storage<Type=Self> + Default;
 }
 
 pub type ComponentId = usize;
@@ -26,7 +27,7 @@ impl ComponentManager {
 
     pub fn register<T>(&mut self) -> ComponentId
     where
-        T: Component,
+        T: Component + 'static,
     {
         use std::collections::hash_map::Entry;
 
@@ -43,7 +44,7 @@ impl ComponentManager {
 
     pub fn id<T>(&self) -> ComponentId
     where
-        T: Component,
+        T: Component + 'static,
     {
         self.ids
             .get(&TypeId::of::<T>())

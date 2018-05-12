@@ -16,7 +16,7 @@ pub struct Not<T: Component>(PhantomData<T>);
 
 impl<T> Aspect for T
 where
-    T: Component,
+    T: Component + 'static,
 {
     fn req(manager: &ComponentManager) -> BitSet {
         let mut keys = BitSet::new();
@@ -27,7 +27,7 @@ where
 
 impl<T> Aspect for Not<T>
 where
-    T: Component,
+    T: Component + 'static,
 {
     fn not(manager: &ComponentManager) -> BitSet {
         let mut keys = BitSet::new();
