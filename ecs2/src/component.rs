@@ -11,10 +11,10 @@ where
     type Storage: Storage<Self>;
 }
 
-pub(crate) type ComponentId = usize;
+pub type ComponentId = usize;
 
 #[derive(Default)]
-pub(crate) struct ComponentManager {
+pub struct ComponentManager {
     current: usize,
     ids: FxHashMap<TypeId, ComponentId>,
 }

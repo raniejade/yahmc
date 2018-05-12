@@ -2,7 +2,7 @@ use bit_set::BitSet;
 use component::{Component, ComponentManager};
 use std::marker::PhantomData;
 
-pub(crate) trait Aspect {
+pub trait Aspect {
     fn req(_manager: &ComponentManager) -> BitSet {
         BitSet::new()
     }

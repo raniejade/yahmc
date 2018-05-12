@@ -79,6 +79,14 @@ impl EntityManager {
         EntityEditor::new(entity, self)
     }
 
+    pub fn entities<T: Aspect>(&self) -> Vec<Entity> {
+        self.index.entities::<T>(&self.component_manager)
+    }
+
+    pub fn is_alive(&self, entity: Entity) -> bool {
+        self.storage.is_alive(entity)
+    }
+
     pub fn register<T: Aspect>(&mut self) {
         self.index.register::<T>(&self.component_manager)
     }

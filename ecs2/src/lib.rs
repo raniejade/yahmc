@@ -11,36 +11,47 @@ pub mod system;
 use std::default::Default;
 use std::time::Duration;
 
+use aspect::Aspect;
 use component::Component;
 use entity::EntityManager;
-use system::System;
+use system::{System, SystemDispatcher};
 
-pub struct World {
+pub struct World<'a> {
     entity_manager: EntityManager,
+    dispatcher: SystemDispatcher<'a>
 }
 
-impl World {
-    fn new(entity_manager: EntityManager) -> Self {
-        World { entity_manager }
+impl<'a> World<'a> {
+    fn new(entity_manager: EntityManager, dispatcher: SystemDispatcher<'a>) -> Self {
+        World {
+            entity_manager,
+            dispatcher
+        }
     }
 }
 
-pub struct WorldBuilder {
+pub struct WorldBuilder<'a> {
     entity_manager: EntityManager,
+    dispatcher: SystemDispatcher<'a>
 }
 
-impl WorldBuilder {
+impl<'a> WorldBuilder<'a> {
     pub fn new() -> Self {
         WorldBuilder {
             entity_manager: Default::default(),
+            dispatcher: Default::default()
         }
     }
 
-    pub fn register_component<T: Component>(&mut self) {}
+    pub fn register_component<T: Component>(&mut self) {
+        self.entity_manager.component_manager.register::<T>();
+    }
 
-    pub fn register_system(&mut self, system: impl System) {}
+    pub fn register_system(&mut self, system: impl System + 'a) {
+        self.dispatcher.register(system)
+    }
 
-    pub fn build(self) -> World {
-        World::new(self.entity_manager)
+    pub fn build(self) -> World<'a> {
+        World::new(self.entity_manager, self.dispatcher)
     }
 }
