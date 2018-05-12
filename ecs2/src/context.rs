@@ -1,10 +1,8 @@
 use aspect::Aspect;
-use entity::{Entity, EntityEditor};
 use component::Component;
+use entity::{Entity, EntityEditor};
 
-pub struct Context {
-
-}
+pub struct Context {}
 
 impl Context {
     pub fn create(&mut self) -> EntityEditor {

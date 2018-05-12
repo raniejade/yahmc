@@ -1,11 +1,11 @@
 use std::default::Default;
 
-use entity::Entity;
 use component::Component;
+use entity::Entity;
 
 pub trait Storage<T>: Default
 where
-    T: Component
+    T: Component,
 {
     fn get(&self, entity: Entity) -> &T;
     fn get_mut(&mut self, entity: Entity) -> &mut T;

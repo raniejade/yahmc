@@ -2,8 +2,8 @@ extern crate ecs;
 #[macro_use]
 extern crate ecs_derive;
 
-use ecs::component::Component;
 use ecs::component::storage::VecStorage;
+use ecs::component::Component;
 use std::any::TypeId;
 
 #[derive(Component)]

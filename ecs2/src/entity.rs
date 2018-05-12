@@ -9,14 +9,14 @@ pub type Entity = usize;
 
 pub struct EntityEditor<'a> {
     pub entity: Entity,
-    entity_manager: &'a mut EntityManager
+    entity_manager: &'a mut EntityManager,
 }
 
 impl<'a> EntityEditor<'a> {
     fn new(entity: Entity, entity_manager: &'a mut EntityManager) -> Self {
         EntityEditor {
             entity,
-            entity_manager
+            entity_manager,
         }
     }
 
@@ -54,7 +54,7 @@ pub(crate) struct EntityManager {
     storage: EntityStorage,
     states: EntityStates,
     index: AspectIndex,
-    pub component_manager: ComponentManager
+    pub component_manager: ComponentManager,
 }
 
 impl EntityManager {
@@ -119,7 +119,7 @@ impl EntityManager {
 
 #[derive(Default)]
 struct EntityStates {
-    state: FxHashMap<Entity, BitSet>
+    state: FxHashMap<Entity, BitSet>,
 }
 
 impl EntityStates {
@@ -138,7 +138,7 @@ impl EntityStates {
 
 #[derive(Default)]
 struct AspectIndex {
-    index: FxHashMap<Matcher, BitSet>
+    index: FxHashMap<Matcher, BitSet>,
 }
 
 impl AspectIndex {
@@ -183,7 +183,7 @@ impl AspectIndex {
             for entity in index.iter() {
                 result.push(entity);
             }
-            return result
+            return result;
         }
 
         panic!("Aspect not registered!");
@@ -194,11 +194,11 @@ impl AspectIndex {
 struct EntityStorage {
     next_id: usize,
     alive: BitSet,
-    limbo: Vec<Entity>
+    limbo: Vec<Entity>,
 }
 
 impl EntityStorage {
-    fn new()  -> Self {
+    fn new() -> Self {
         Default::default()
     }
 
@@ -239,7 +239,9 @@ trait ComponentSetter {
 }
 
 impl<T> ComponentSetter for T
-where T: Component {
+where
+    T: Component,
+{
     fn set_bit(component_manager: &ComponentManager, bits: &mut BitSet) {
         bits.insert(component_manager.id::<T>());
     }
@@ -369,7 +371,11 @@ mod tests {
 
         index.update(&component_manager, entity, &bits);
 
-        assert!(index.entities::<MyAspect>(&component_manager).contains(&entity));
+        assert!(
+            index
+                .entities::<MyAspect>(&component_manager)
+                .contains(&entity)
+        );
     }
 
     #[test]
@@ -393,7 +399,9 @@ mod tests {
         AnotherComponent::unset_bit(&component_manager, &mut bits);
         index.update(&component_manager, entity, &bits);
 
-        assert!(!index.entities::<MyAspect>(&component_manager).contains(&entity));
+        assert!(!index
+            .entities::<MyAspect>(&component_manager)
+            .contains(&entity));
     }
 
     #[test]
@@ -416,7 +424,9 @@ mod tests {
         // sometime later
         index.remove(&component_manager, entity);
 
-        assert!(!index.entities::<MyAspect>(&component_manager).contains(&entity));
+        assert!(!index
+            .entities::<MyAspect>(&component_manager)
+            .contains(&entity));
     }
 
     #[test]

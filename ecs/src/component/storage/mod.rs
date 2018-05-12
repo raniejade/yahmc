@@ -2,8 +2,8 @@ use bit_set::BitSet;
 use std::default::Default;
 use std::mem;
 
-use super::Component;
 use super::super::join::Join;
+use super::Component;
 
 mod builtin;
 
@@ -21,8 +21,9 @@ pub trait RawStorage<T: Component>: Default + Sized {
 
 pub struct MaskedStorage<T: Component>(BitSet, T::Storage);
 
-impl<T> MaskedStorage<T> 
-where T: Component,
+impl<T> MaskedStorage<T>
+where
+    T: Component,
 {
     pub fn new() -> Self {
         MaskedStorage(Default::default(), Default::default())

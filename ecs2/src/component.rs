@@ -1,12 +1,12 @@
+use fxhash::FxHashMap;
 use std::any::{Any, TypeId};
 use std::default::Default;
-use fxhash::FxHashMap;
 
 use storage::Storage;
 
 pub trait Component
 where
-    Self: Sized + Any + Send + Sync + Default
+    Self: Sized + Any + Send + Sync + Default,
 {
     type Storage: Storage<Self>;
 }
@@ -16,7 +16,7 @@ pub(crate) type ComponentId = usize;
 #[derive(Default)]
 pub(crate) struct ComponentManager {
     current: usize,
-    ids: FxHashMap<TypeId, ComponentId>
+    ids: FxHashMap<TypeId, ComponentId>,
 }
 
 impl ComponentManager {
@@ -26,7 +26,7 @@ impl ComponentManager {
 
     pub fn register<T>(&mut self) -> ComponentId
     where
-        T: Component
+        T: Component,
     {
         use std::collections::hash_map::Entry;
 
@@ -43,17 +43,19 @@ impl ComponentManager {
 
     pub fn id<T>(&self) -> ComponentId
     where
-        T: Component
+        T: Component,
     {
-        self.ids.get(&TypeId::of::<T>()).expect("Component not registered!")
+        self.ids
+            .get(&TypeId::of::<T>())
+            .expect("Component not registered!")
             .clone()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::storage::VecStorage;
+    use super::*;
 
     #[derive(Default)]
     struct MyComponent;
@@ -92,6 +94,9 @@ mod tests {
     #[test]
     fn unique() {
         let mut manager = ComponentManager::new();
-        assert_ne!(manager.register::<MyComponent>(), manager.register::<AnotherComponent>());
+        assert_ne!(
+            manager.register::<MyComponent>(),
+            manager.register::<AnotherComponent>()
+        );
     }
 }

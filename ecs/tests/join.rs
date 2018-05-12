@@ -5,9 +5,9 @@ extern crate ecs_derive;
 use ecs::component::storage::VecStorage;
 use ecs::component::{Component, WriteStorage};
 use ecs::entity::Entities;
+use ecs::join::Join;
 use ecs::system::System;
 use ecs::{Dispatcher, World};
-use ecs::join::Join;
 
 #[derive(Component)]
 #[Storage(VecStorage)]

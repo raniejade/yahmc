@@ -18,7 +18,7 @@ trait Executor {
 impl<T, K> Executor for K
 where
     T: Aspect,
-    K: System<Aspect=T>
+    K: System<Aspect = T>,
 {
     fn execute(&mut self, context: &mut Context, duration: Duration) {
         let entities = context.get_entities::<T>();
@@ -28,7 +28,7 @@ where
 
 #[derive(Default)]
 pub(crate) struct SystemDispatcher<'a> {
-    systems: Vec<Box<Executor + 'a>>
+    systems: Vec<Box<Executor + 'a>>,
 }
 
 impl<'a> SystemDispatcher<'a> {
@@ -36,7 +36,7 @@ impl<'a> SystemDispatcher<'a> {
         Default::default()
     }
 
-    fn register<T: Aspect>(&mut self, system: impl System<Aspect=T> + 'a) {
+    fn register<T: Aspect>(&mut self, system: impl System<Aspect = T> + 'a) {
         self.systems.push(Box::new(system))
     }
 
@@ -49,8 +49,8 @@ impl<'a> SystemDispatcher<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::storage::VecStorage;
+    use super::*;
     use aspect::{Aspect, Not};
     use component::{Component, ComponentManager};
     use entity::Entity;
@@ -82,7 +82,9 @@ mod tests {
         manager.register::<AnotherComponent>();
 
         // all good as long as this compiles
-        let (_req, _not) = (<MySystem as System>::Aspect::req(&manager),
-                            <MySystem as System>::Aspect::not(&manager));
+        let (_req, _not) = (
+            <MySystem as System>::Aspect::req(&manager),
+            <MySystem as System>::Aspect::not(&manager),
+        );
     }
 }

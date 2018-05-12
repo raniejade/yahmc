@@ -3,12 +3,12 @@ use std::mem;
 use super::*;
 
 pub struct VecStorage<T: Component> {
-    components: Vec<T>
+    components: Vec<T>,
 }
 
 impl<T> VecStorage<T>
 where
-    T: Component
+    T: Component,
 {
     fn new() -> Self {
         Default::default()
@@ -19,7 +19,7 @@ const GROWTH_FACTOR: usize = 10;
 
 impl<T> Default for VecStorage<T>
 where
-    T: Component
+    T: Component,
 {
     fn default() -> Self {
         let mut components = Vec::with_capacity(GROWTH_FACTOR);
@@ -27,15 +27,13 @@ where
             components.set_len(GROWTH_FACTOR);
         }
 
-        VecStorage {
-            components
-        }
+        VecStorage { components }
     }
 }
 
 impl<T> Storage<T> for VecStorage<T>
 where
-    T: Component
+    T: Component,
 {
     fn get(&self, entity: Entity) -> &T {
         &self.components[entity]
@@ -59,9 +57,7 @@ where
     }
 
     fn remove(&mut self, entity: Entity) -> T {
-        unsafe {
-            mem::replace(&mut self.components[entity], mem::zeroed())
-        }
+        unsafe { mem::replace(&mut self.components[entity], mem::zeroed()) }
     }
 }
 

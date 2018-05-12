@@ -31,8 +31,7 @@ fn fetch_system_data_tuple() {
     let mut resources = Resources::new();
     resources.add(SomeResource(0));
     resources.add(AnotherResource(1));
-    let (some, mut another) =
-        <(Fetch<SomeResource>, FetchMut<AnotherResource>)>::fetch(&resources);
+    let (some, mut another) = <(Fetch<SomeResource>, FetchMut<AnotherResource>)>::fetch(&resources);
     assert_eq!(some.0, 0);
     another.0 = 2;
     assert_eq!(another.0, 2);

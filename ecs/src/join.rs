@@ -8,7 +8,7 @@ pub trait Join {
 
     fn join(self) -> JoinIterator<Self>
     where
-        Self: Sized
+        Self: Sized,
     {
         JoinIterator::new(self)
     }
@@ -23,7 +23,7 @@ pub struct JoinIterator<T: Join> {
 
 impl<T> JoinIterator<T>
 where
-    T: Join
+    T: Join,
 {
     pub fn new(join: T) -> Self {
         let keys = join.open();
@@ -33,20 +33,19 @@ where
         }
         JoinIterator {
             keys: vec.into_iter(),
-            join
+            join,
         }
     }
 }
 
 impl<T> Iterator for JoinIterator<T>
 where
-    T: Join
+    T: Join,
 {
     type Item = T::Item;
 
     fn next(&mut self) -> Option<T::Item> {
-        self.keys.next()
-            .map(|idx| { self.join.get(idx) })
+        self.keys.next().map(|idx| self.join.get(idx))
     }
 }
 

@@ -1,6 +1,6 @@
-use std::marker::PhantomData;
 use bit_set::BitSet;
 use component::{Component, ComponentManager};
+use std::marker::PhantomData;
 
 pub(crate) trait Aspect {
     fn req(_manager: &ComponentManager) -> BitSet {
@@ -16,7 +16,7 @@ pub struct Not<T: Component>(PhantomData<T>);
 
 impl<T> Aspect for T
 where
-    T: Component
+    T: Component,
 {
     fn req(manager: &ComponentManager) -> BitSet {
         let mut keys = BitSet::new();
@@ -27,7 +27,7 @@ where
 
 impl<T> Aspect for Not<T>
 where
-    T: Component
+    T: Component,
 {
     fn not(manager: &ComponentManager) -> BitSet {
         let mut keys = BitSet::new();
@@ -39,14 +39,14 @@ where
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub(crate) struct Matcher {
     req: BitSet,
-    not: BitSet
+    not: BitSet,
 }
 
 impl Matcher {
     pub fn new<T: Aspect>(manager: &ComponentManager) -> Self {
         Matcher {
             req: <T>::req(manager),
-            not: <T>::not(manager)
+            not: <T>::not(manager),
         }
     }
 
@@ -79,7 +79,6 @@ macro_rules! impl_aspect {
         }
     };
 }
-
 
 mod impl_aspect {
     #![cfg_attr(rustfmt, rustfmt_skip)]
@@ -116,8 +115,8 @@ mod impl_aspect {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::storage::VecStorage;
+    use super::*;
 
     #[derive(Default)]
     struct MyComponent;
@@ -143,8 +142,14 @@ mod tests {
         expected.union_with(&a1);
         expected.union_with(&a2);
 
-        assert_eq!(expected, <(MyComponent, Not<AnotherComponent>)>::req(&manager));
-        assert_ne!(expected, <(MyComponent, Not<AnotherComponent>)>::not(&manager));
+        assert_eq!(
+            expected,
+            <(MyComponent, Not<AnotherComponent>)>::req(&manager)
+        );
+        assert_ne!(
+            expected,
+            <(MyComponent, Not<AnotherComponent>)>::not(&manager)
+        );
     }
 
     #[test]
@@ -159,8 +164,14 @@ mod tests {
         expected.union_with(&a1);
         expected.union_with(&a2);
 
-        assert_eq!(expected, <(MyComponent, Not<AnotherComponent>)>::not(&manager));
-        assert_ne!(expected, <(MyComponent, Not<AnotherComponent>)>::req(&manager));
+        assert_eq!(
+            expected,
+            <(MyComponent, Not<AnotherComponent>)>::not(&manager)
+        );
+        assert_ne!(
+            expected,
+            <(MyComponent, Not<AnotherComponent>)>::req(&manager)
+        );
     }
 
     #[test]

@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 
 use self::storage::{MaskedStorage, RawStorage};
-use super::entity::{EntityStorage, Entity};
+use super::entity::{Entity, EntityStorage};
 use super::resource::{Fetch, FetchMut, Resources};
 use super::system::SystemData;
 

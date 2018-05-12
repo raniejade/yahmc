@@ -1,7 +1,7 @@
+use super::join::Join;
 use bit_set::BitSet;
 use std::cell::RefCell;
-use std::sync::{Arc, Mutex, MutexGuard, LockResult};
-use super::join::Join;
+use std::sync::{Arc, LockResult, Mutex, MutexGuard};
 
 use super::resource::Fetch;
 
@@ -23,23 +23,17 @@ impl EntityStorage {
     pub fn create(&self) -> Entity {
         let id = if !self.is_limbo_empty() {
             // self.limbo.remove(0);
-            self.unlock_mut(self.limbo.lock(), |limbo: &mut Vec<usize>| {
-                limbo.remove(0)
-            })
+            self.unlock_mut(self.limbo.lock(), |limbo: &mut Vec<usize>| limbo.remove(0))
         } else {
             self.next_id()
         };
 
-        self.unlock_mut(self.alive.lock(), |alive: &mut BitSet| {
-            alive.insert(id)
-        });
+        self.unlock_mut(self.alive.lock(), |alive: &mut BitSet| alive.insert(id));
         id as Entity
     }
 
     pub fn is_alive(&self, entity: Entity) -> bool {
-        self.unlock(self.alive.lock(), |alive: &BitSet| {
-            alive.contains(entity)
-        })
+        self.unlock(self.alive.lock(), |alive: &BitSet| alive.contains(entity))
     }
 
     pub fn destroy(&self, entity: Entity) {
@@ -47,15 +41,11 @@ impl EntityStorage {
         self.unlock_mut(self.limbo.lock(), |limbo: &mut Vec<usize>| {
             limbo.push(entity)
         });
-        self.unlock_mut(self.alive.lock(), |alive: &mut BitSet| {
-            alive.remove(entity)
-        });
+        self.unlock_mut(self.alive.lock(), |alive: &mut BitSet| alive.remove(entity));
     }
 
     fn is_limbo_empty(&self) -> bool {
-        self.unlock(self.limbo.lock(), |limbo: & Vec<usize>| {
-            limbo.is_empty()
-        })
+        self.unlock(self.limbo.lock(), |limbo: &Vec<usize>| limbo.is_empty())
     }
 
     fn next_id(&self) -> usize {
@@ -68,7 +58,7 @@ impl EntityStorage {
 
     fn unlock<T, R, F>(&self, lock: LockResult<MutexGuard<RefCell<T>>>, cb: F) -> R
     where
-        F: Fn(&T) -> R
+        F: Fn(&T) -> R,
     {
         let value = lock.expect(LOCK_POISOINED);
         let actual_value = value.borrow();
@@ -77,7 +67,7 @@ impl EntityStorage {
 
     fn unlock_mut<T, R, F>(&self, lock: LockResult<MutexGuard<RefCell<T>>>, cb: F) -> R
     where
-        F: Fn(&mut T) -> R
+        F: Fn(&mut T) -> R,
     {
         let value = lock.expect(LOCK_POISOINED);
         let mut actual_value = value.borrow_mut();
@@ -123,7 +113,7 @@ mod tests {
         let new_entity = entity_storage.create();
         assert_eq!(entity, new_entity);
     }
-    
+
     #[test]
     fn unique_ids() {
         let mut entity_storage = EntityStorage::new();
